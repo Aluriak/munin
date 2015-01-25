@@ -1,0 +1,6 @@
+Session.vim
+munin/password.py
+*.pyc
+__pycache__/
+.*.swp
+.*.swo

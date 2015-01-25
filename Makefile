@@ -1,0 +1,2 @@
+mnn:
+	python -m munin
