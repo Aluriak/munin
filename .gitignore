@@ -1,5 +1,5 @@
 Session.vim
-munin/password.py
+munin/configuration.py
 *.pyc
 __pycache__/
 .*.swp

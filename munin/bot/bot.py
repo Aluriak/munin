@@ -9,7 +9,11 @@
 #########################
 import irc.bot
 import irc.strings
-from munin.password import PASSWORD
+try:
+    from munin.configuration import SERVER, PORT, CHANNEL, NICKNAME, REALNAME, PASSWORD
+except:
+    print('No config file found !\nPlease create your own like munin/configuration_template.py named munin/configuration.py.')
+    exit(0)
 import re
 import time
 import threading
@@ -20,11 +24,6 @@ import threading
 #########################
 # PRE-DECLARATIONS      #
 #########################
-SERVER   = 'irc.freenode.net'
-PORT     = 6667
-CHANNEL  = '#EvolAcc'
-NICKNAME = 'munin'
-REALNAME = 'munin' 
 
 
 
