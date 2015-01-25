@@ -7,6 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
+from munin.functionnalities import Functionnality
 from random import randint
 import re
 
@@ -22,7 +23,7 @@ import re
 #########################
 # CLASS                 #
 #########################
-class DiceLauncher():
+class DiceLauncher(Functionnality):
     """
     Simple Functionnality application.
     Wait for something like:
@@ -38,6 +39,7 @@ class DiceLauncher():
 
 # CONSTRUCTOR #################################################################
     def __init__(self):
+        super().__init__()
         self._regex = self.REGEX
 
 

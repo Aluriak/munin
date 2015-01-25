@@ -7,6 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
+from munin.functionnalities import Functionnality
 import re
 
 
@@ -21,7 +22,7 @@ import re
 #########################
 # CLASS                 #
 #########################
-class Corrector():
+class Corrector(Functionnality):
     """
     Simple Functionnality application.
     Repeat last sentence of user that correct it by using a regex.
@@ -36,6 +37,7 @@ class Corrector():
 
 # CONSTRUCTOR #################################################################
     def __init__(self):
+        super().__init__()
         self._regex = self.REGEX
         self.last_words = {} # author:last message
 

@@ -9,12 +9,7 @@
 #########################
 import threading
 import re
-from munin.functionnalities import DiceLauncher
-from munin.functionnalities import Corrector
-from munin.functionnalities import GitWatcher
-from munin.functionnalities import TodoList
-from munin.functionnalities import Helper
-from munin.functionnalities import PrologDB
+import munin.functionnalities as fnct
 #from munin.functionnalities import Admin
 
 
@@ -51,12 +46,11 @@ class Control():
         self.bot_thread.start()
 
         # Initial functionnalities
-        self.bot.add_functionnality(DiceLauncher())
-        self.bot.add_functionnality(Corrector())
-        self.bot.add_functionnality(GitWatcher())
-        self.bot.add_functionnality(TodoList())
-        self.bot.add_functionnality(Helper())
-        self.bot.add_functionnality(PrologDB())
+        self.available_functionnalities = [f for f in (getattr(fnct, f) for f in fnct.__dir__())
+                                           if callable(f) and isinstance(f(), fnct.Functionnality) 
+                                           and f.__class__ is not fnct.Functionnality]
+        for f in self.available_functionnalities:
+            self.bot.add_functionnality(f())
 
         # main control buckle
         print('Connected !')

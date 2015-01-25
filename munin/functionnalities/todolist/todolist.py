@@ -7,6 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
+from munin.functionnalities import Functionnality
 import re
 import pickle
 
@@ -21,7 +22,7 @@ import pickle
 #########################
 # TODOLIST              #
 #########################
-class TodoList():
+class TodoList(Functionnality):
     """
     Advanced Functionnality application.
     """
@@ -34,6 +35,7 @@ class TodoList():
 
 # CONSTRUCTOR #################################################################
     def __init__(self, savefile=SAVE_FILE_DEFAULT):
+        super().__init__()
         self._regex   = self.REGEX
         self.savefile = savefile
         self.todolist = [] # (str, bool) strings are things to do, bool is check predicat

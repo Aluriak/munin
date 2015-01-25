@@ -7,6 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
+from munin.functionnalities import Functionnality
 import re
 
 
@@ -21,7 +22,7 @@ import re
 #########################
 # CLASS                 #
 #########################
-class Helper():
+class Helper(Functionnality):
     """
     Simple Functionnality application.
     Provide some help on current bot functionnalities.
@@ -31,6 +32,7 @@ class Helper():
 
 # CONSTRUCTOR #################################################################
     def __init__(self):
+        super().__init__()
         self._regex = self.REGEX
 
 
