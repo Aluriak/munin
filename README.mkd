@@ -1,0 +1,41 @@
+# Munin
+IRC bot made in python 3.
+
+
+## Interests
+Munin is fully extendable.  
+See [functionnalities](https://github.com/Aluriak/munin/blob/master/munin/functionnalities/dice_launcher/dice_launcher.py) for an example of functionnality, that is 
+added automatically at launch by Control module.
+
+
+## Functionnality
+Create a functionnality pass by specialize the [Functionnality class](), and add an import to [functionnalities init file]().  
+Some examples are provided :
+- dice launcher, for playing RPG on IRC;
+- corrector, because your last sentence need to be correct by regex;
+- helper, for print help about others functionnalities;
+- todolist, for managing todolists;
+
+
+## Nexts improvements
+Functionnalities:  
+- prolog database, for do… things;
+- git watcher, for channel notification at events on a repo;
+- admin panel, for managing munin things;
+  
+Local Admin:  
+- white/black lists of functionnalities to run by default:
+- more prompt commands;
+- better prompt;
+
+
+## Start an instance of munin
+First, you need to creat a munin/configuration.py file:
+        
+        cp munin/configuration_template.py munin/configuration.py
+
+Edit it for have your bot as expected:
+
+        vim munin/configuration.py
+
+
