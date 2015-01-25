@@ -38,7 +38,6 @@ class Corrector(Functionnality):
 # CONSTRUCTOR #################################################################
     def __init__(self):
         super().__init__()
-        self._regex = self.REGEX
         self.last_words = {} # author:last message
 
 
@@ -68,16 +67,7 @@ class Corrector(Functionnality):
 
 # PRIVATE METHODS #############################################################
 # PREDICATS ###################################################################
-    def want_speak(self):
-        """Return True iff self have something to say"""
-        return False
-
-
 # ACCESSORS ###################################################################
-    @property
-    def regex(self):
-        return self._regex
-
     @property
     def help(self):
         return """CORRECTOR: apply regex as s/// format to your last sentence. Useless but fun."""

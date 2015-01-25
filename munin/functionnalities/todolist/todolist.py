@@ -36,7 +36,6 @@ class TodoList(Functionnality):
 # CONSTRUCTOR #################################################################
     def __init__(self, savefile=SAVE_FILE_DEFAULT):
         super().__init__()
-        self._regex   = self.REGEX
         self.savefile = savefile
         self.todolist = [] # (str, bool) strings are things to do, bool is check predicat
         TodoList.FEATURES.update({ # useless, except in the first case of instanciation
@@ -133,16 +132,7 @@ class TodoList(Functionnality):
 
 
 # PREDICATS ###################################################################
-    def want_speak(self):
-        """Return True iff self have something to say"""
-        return False
-
-
 # ACCESSORS ###################################################################
-    @property
-    def regex(self):
-        return self._regex
-
     @property
     def help(self):
         return """TODOLIST: wait for 'todo {add,print,check,clean,load,save}' command, for management of todo lists. Need sudo."""

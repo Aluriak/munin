@@ -33,7 +33,6 @@ class Helper(Functionnality):
 # CONSTRUCTOR #################################################################
     def __init__(self):
         super().__init__()
-        self._regex = self.REGEX
 
 
 # PUBLIC METHODS ##############################################################
@@ -53,16 +52,7 @@ class Helper(Functionnality):
 
 # PRIVATE METHODS #############################################################
 # PREDICATS ###################################################################
-    def want_speak(self):
-        """Return True iff self have something to say"""
-        return False
-
-
 # ACCESSORS ###################################################################
-    @property
-    def regex(self):
-        return self._regex
-
     @property
     def help(self):
         return "HELPER: wait for 'help [n]' command, for general help or about bot or its functionnalities."

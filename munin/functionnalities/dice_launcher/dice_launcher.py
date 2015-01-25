@@ -40,7 +40,6 @@ class DiceLauncher(Functionnality):
 # CONSTRUCTOR #################################################################
     def __init__(self):
         super().__init__()
-        self._regex = self.REGEX
 
 
 # PUBLIC METHODS ##############################################################
@@ -62,16 +61,7 @@ class DiceLauncher(Functionnality):
 
 # PRIVATE METHODS #############################################################
 # PREDICATS ###################################################################
-    def want_speak(self):
-        """Return True iff self have something to say"""
-        return False
-
-
 # ACCESSORS ###################################################################
-    @property
-    def regex(self):
-        return self._regex
-
     @property
     def help(self):
         return """DICELAUNCHER: launch dices. Try something like '3d5 3d20', you will understand."""

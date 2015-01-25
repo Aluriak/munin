@@ -54,7 +54,10 @@ class Functionnality():
         raise NotImplementedError
 
     def say_something(self):
-        """Say something. Called only when self.want_speak() returned True"""
+        """Say something. Called only when self.want_speak() returned True.
+        
+        If a specialization don't have to tell something without order of anothers
+        IRC users, this method don't need an overriding."""
         raise NotImplementedError
 
 
@@ -62,14 +65,20 @@ class Functionnality():
 # PRIVATE METHODS #############################################################
 # PREDICATS ###################################################################
     def want_speak(self):
-        """Return True iff self have something to say"""
+        """Return True iff self have something to say
+        
+        If a specialization don't have to tell something without order of anothers
+        IRC users, this method don't need an overriding."""
         return False
 
 
 # ACCESSORS ###################################################################
     @property
     def regex(self):
-        """Return regex used for match and receive things about message"""
+        """Return regex used for match and receive things about message
+
+        Specializations don't have to override this methodes if they defines their
+        own REGEX class constant."""
         return self.REGEX
 
     @property
