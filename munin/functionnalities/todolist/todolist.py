@@ -39,7 +39,7 @@ class TodoList(Functionnality):
         self._regex   = self.REGEX
         self.savefile = savefile
         self.todolist = [] # (str, bool) strings are things to do, bool is check predicat
-        TodoList.FEATURES.update({
+        TodoList.FEATURES.update({ # useless, except in the first case of instanciation
             re.compile(r"a(?:dd)? +(.*)")               : TodoList.todolist_add,
             re.compile(r"c(?:heck)?((?:\s+\d+)+)")      : TodoList.todolist_check,
             re.compile(r"p(?:rint)? *")                 : TodoList.todolist_print, 
