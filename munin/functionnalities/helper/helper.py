@@ -44,7 +44,6 @@ class Helper(Functionnality):
                     ' ; '.join([str(i) + ':' + f.__class__.__name__ for i, f in enumerate(bot.functionnalities)])
         else: 
             # matched_groups have a number that correspond maybe to a functionnality
-            print('DEBUX:', matched_groups[0])
             indexes = [int(_) for _ in matched_groups[0].split(' ') if _ is not '']
             results = '\n'.join([f.help for i, f in enumerate(bot.functionnalities) if i in indexes])
         return results
