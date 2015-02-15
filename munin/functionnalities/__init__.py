@@ -8,5 +8,5 @@ from munin.functionnalities.helper.helper import Helper
 
 # advanced ones
 from munin.functionnalities.todolist.todolist import TodoList
-#from munin.functionnalities.git_watcher.git_watcher import GitWatcher
+from munin.functionnalities.rsswatcher.rsswatcher import RssWatcher
 #from munin.functionnalities.prolog_db.prolog_db import PrologDB
