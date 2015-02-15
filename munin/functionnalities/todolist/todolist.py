@@ -8,8 +8,8 @@
 # IMPORTS               #
 #########################
 from munin.functionnalities import Functionnality
-import re
 import pickle
+import re
 
 
 
@@ -27,7 +27,7 @@ class TodoList(Functionnality):
     Advanced Functionnality application.
     """
     REGEX     = re.compile(r" *to?do? (.+)")
-    FEATURES  = {}
+    FEATURES  = {} # dict of regex:method, initialized in __init__
     SAVE_FILE_PREFIX  = 'data/'
     SAVE_FILE_SUFFIX  = '.tdl'
     SAVE_FILE_DEFAULT = 'default_todo_list'
