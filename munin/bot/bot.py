@@ -81,7 +81,7 @@ class Bot(irc.bot.SingleServerIRCBot):
         """Check functionnalities, and give them a chance to speak"""
         for func in self.functionnalities:
             if func.want_speak():
-                self.send_message(*func.say_something())
+                self.send_message(func.say_something())
 
     def add_sudoer(self, name):
         """add given name to sudoers"""
