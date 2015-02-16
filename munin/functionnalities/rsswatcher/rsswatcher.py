@@ -103,7 +103,7 @@ class RssWatcher(Functionnality):
         """Load RSS feeds from a pickle file"""
         try:
             with open(self.savefile, 'rb') as f:
-                self.urls = pickle.load(self.urls, f)
+                self.urls = pickle.load(f)
         except FileNotFoundError:
             print("ERROR: RssWatcher can't find file " + self.savefile)
             self.urls = {}
