@@ -44,12 +44,19 @@ class RssWatcher(Functionnality):
     def __init__(self, urls=None, savefile=SAVE_FILE_DEFAULT, temporization=10):
         """Optionnaly wait for a list of rss feed url and a filename."""
         super(Functionnality).__init__()
-        self.urls = {}
         self.news = []
-        [self.__add_rss_feed(url) for url in ([] if urls is None else urls)] 
-        self.savefile = savefile
+        self.savefile = (RssWatcher.SAVE_FILE_PREFIX 
+                         + savefile 
+                         + RssWatcher.SAVE_FILE_SUFFIX
+                        )
         self.temporization = temporization 
         self.terminated = False
+        if urls is None:    
+            self.load_rss_feeds()
+        else:
+            [self.__add_rss_feed(url) 
+             for url in ([] if urls is None else urls)
+            ] 
         # start check RSS feeds
         def checker_daemon(rsswatcher_instance):
             """Check all RSS feed for news regularly"""
@@ -74,7 +81,7 @@ class RssWatcher(Functionnality):
         """Save rss_feed in self.savefile file"""
         self.terminated = True
         self.check_rss_thread.join()
-        #self.__save_rss_feeds()
+        self.save_rss_feeds()
 
 
 # PUBLIC METHODS ##############################################################
@@ -92,6 +99,23 @@ class RssWatcher(Functionnality):
         self.news = []
         return text
 
+    def load_rss_feeds(self):
+        """Load RSS feeds from a pickle file"""
+        try:
+            with open(self.savefile, 'rb') as f:
+                self.urls = pickle.load(self.urls, f)
+        except FileNotFoundError:
+            print("ERROR: RssWatcher can't find file " + self.savefile)
+            self.urls = {}
+
+    def save_rss_feeds(self):
+        """Save RSS feeds in a file in pickle"""
+        try:
+            with open(self.savefile, 'wb') as f:
+                pickle.dump(self.urls, f)
+        except FileNotFoundError:
+            print("ERROR: RssWatcher can't find file " + self.savefile)
+
 
 # PRIVATE METHODS #############################################################
     def __add_rss_feed(self, url):
@@ -99,6 +123,7 @@ class RssWatcher(Functionnality):
         last = last_news(url)
         if last is not None:
             self.urls[url] = last.date
+            self.save_rss_feeds()
             return 'Last item is ' + last.link
         else:
             return 'No RSS feed found…'
