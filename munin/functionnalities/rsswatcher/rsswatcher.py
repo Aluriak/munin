@@ -97,6 +97,7 @@ class RssWatcher(Functionnality):
             for item in self.news
         ))
         self.news = []
+        self.save_rss_feeds() # update RSS feed save
         return text
 
     def load_rss_feeds(self):
