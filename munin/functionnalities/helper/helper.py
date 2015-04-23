@@ -40,7 +40,7 @@ class Helper(Functionnality):
         """Execute command for bot (used), according to regex matchs (used) and sudo mode (unused)"""
         if matched_groups[0] is None:
             # general help
-            results = 'This bot can be found as source code here: http://github.com/aluriak/irc-bot\n' + \
+            results = 'This bot can be found as source code here: http://github.com/aluriak/munin\n' + \
                     ' ; '.join([str(i) + ':' + f.__class__.__name__ for i, f in enumerate(bot.functionnalities)])
         else: 
             # matched_groups have a number that correspond maybe to a functionnality
