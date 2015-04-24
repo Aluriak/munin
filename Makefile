@@ -1,5 +1,5 @@
 mnn:
-	python -m munin
+	python3 -m munin
 
 tt:
 	pylint munin/__main__.py
