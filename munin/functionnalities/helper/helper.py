@@ -36,7 +36,7 @@ class Helper(Functionnality):
 
 
 # PUBLIC METHODS ##############################################################
-    def do_command(self, bot, matched_groups, sudo=False, author=None):
+    def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
         """Execute command for bot (used), 
         according to regex matchs (used) and sudo mode (unused)"""
         if matched_groups[0] is None:
