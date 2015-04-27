@@ -28,7 +28,7 @@ class Loki(Functionnality):
         My scars hurts! -> My balls hurts!
     """
     REGEX     = re.compile(r"(.*)")                     # Vas matcher tout les messages -> déclenche corrector à chaque fois
-    REGEX_RGX = re.compile(r"munin: loki (.+)")   # Déclencheur (.+) est retourné dans matched_group[0] (do cmd (ln48))
+    REGEX_RGX = re.compile(r"munin: loki ([^\s]+)")   # Déclencheur (.+) est retourné dans matched_group[0] (do cmd (ln48))
 
 
 ###############
@@ -47,12 +47,15 @@ class Loki(Functionnality):
         results = ''
         target=matched_groups[0]
         # if its a correction
-        regres = Corrector.REGEX_RGX.fullmatch(matched_groups[0])
+        regres = Loki.REGEX_RGX.fullmatch(target)
         if regres is not None:
             # author need a pervert version
-            regres = regres.groups()
-            if target in self.last_words:
-                result = _turn_pervert(self.last_words[target])
+            print (self.last_words, target, author)
+            regres = regres.groups()[0]
+            print (regres)
+            if regres in self.last_words:
+                results = Loki._turn_pervert(self.last_words[regres])
+            return results +"arrivé"
         else:
             # get last message of author
             self.last_words[author] = target
@@ -62,15 +65,16 @@ class Loki(Functionnality):
 ###################
 # PRIVATE METHODS #
 ###################
+    @staticmethod
     def _turn_pervert(base):
         key=("ma",  "mes",  "mon")
         reco = tuple((j, j.index()) for j in base.split(" ") if j in key)
         if reco != ():
-            return _change(base,  reco[-1])
+            return Loki._change(base,  reco[-1])
         else:
-            return "Je suis désolé, mais là pour le coup, je ne trouve rien à\
-        dire, donc du coup je vais raconter une blague!\n"+_blague()
+            return "Je suis désolé, mais là pour le coup, je ne trouve rien à dire, donc je vais raconter une blague!\n"+Loki._blague()
 
+    @staticmethod
     def _change(phrase, mot):
         borne=phrase.find(mot)
         if mot == "ma":
@@ -80,9 +84,9 @@ class Loki(Functionnality):
         elif mot == "mon":
             return phrase[0:borne]+"cul "+phrase[borne+4:]
 
-
+    @staticmethod
     def _blague():
-        f = open("blagues.txt", 'r')
+        f = open("data/blagues.txt", 'r')
         lignes = f.readlines()
         f.close()
         compilation = []

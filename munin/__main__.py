@@ -7,8 +7,8 @@
 from munin.bot import Bot
 from munin.control import Control
 
-Control(Bot('munin'))
-        
+Control(Bot())
+
 
 
 
