@@ -6,6 +6,9 @@ from munin.functionnalities.dice_launcher.dice_launcher import DiceLauncher
 from munin.functionnalities.corrector.corrector import Corrector
 from munin.functionnalities.helper.helper import Helper
 
+# tested
+from munin.functionnalities.insult.insult import Insult
+
 # advanced ones
 from munin.functionnalities.todolist.todolist import TodoList
 from munin.functionnalities.rsswatcher.rsswatcher import RssWatcher
