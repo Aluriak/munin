@@ -9,6 +9,7 @@
 #########################
 import irc.bot
 import irc.strings
+import irc.client
 try:
     from munin.configuration import SERVER, PORT, CHANNEL, NICKNAME, REALNAME, PASSWORD
 except:
@@ -64,13 +65,17 @@ class Bot(irc.bot.SingleServerIRCBot):
         """"""
         if private is True: assert(private is True and dest is not None)
         assert(msg is not None)
-        if private is True:
-            self.connection.privmsg(dest, msg)
-        else:
-            if dest in (None, ''):
-                self.connection.privmsg(self.channel, msg)
+        try:
+            if private is True:
+                self.connection.privmsg(dest, msg)
             else:
-                self.connection.privmsg(self.channel, dest + ': ' + msg)
+                if dest in (None, ''):
+                    self.connection.privmsg(self.channel, msg)
+                else:
+                    self.connection.privmsg(self.channel, dest + ': ' + msg)
+        except irc.client.MessageTooLong:
+            print('ERROR: too long message')
+            self.connection.privmsg(self.channel, 'too long message')
         return None
 
     def add_functionnality(self, func):
