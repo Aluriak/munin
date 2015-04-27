@@ -55,7 +55,7 @@ class TodoList(Functionnality):
 
 
 # PUBLIC METHODS ##############################################################
-    def do_command(self, bot, matched_groups, sudo=False, author=None):
+    def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
         """Execute command for bot (unused), according to regex matchs (used) and sudo mode (unused)"""
         if not sudo: return '' # sudo is needed
         results = ''
@@ -66,7 +66,7 @@ class TodoList(Functionnality):
             if regres is not None: # match !
                 results += feature(self, regres.groups()) or ''
 
-        return results 
+        return results
 
     def todolist_add(self, matched_groups):
         """add received string to todo list"""

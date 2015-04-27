@@ -36,7 +36,7 @@ class Functionnality():
     """
     # default REGEX that is used for determined if 
     # functionnality must be called, and with whitch parameters.
-    REGEX = re.compile(r"")
+    REGEX = re.compile(r"(.*)")
 
 
 # CONSTRUCTOR #################################################################
@@ -45,7 +45,15 @@ class Functionnality():
 
 
 # PUBLIC METHODS ##############################################################
-    def do_command(self, bot, matched_groups, sudo=False, author=None):
+    def accept_message(self, message, sudo=False, author=None):
+        """message is the complete message received from IRC
+        This method return None if Functionnality don't need to 
+         react to the message.
+        Else, returned value will be received by do_command method.
+        """
+        return self.regex().fullmatch(message)
+
+    def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
         """Execute command for bot, according to regex matchs, sudo mode, and author
         
         Return a string that will be sended by the bot. Not that string
@@ -73,13 +81,13 @@ class Functionnality():
 
 
 # ACCESSORS ###################################################################
-    @property
-    def regex(self):
+    @classmethod
+    def regex(cls):
         """Return regex used for match and receive things about message
 
         Specializations don't have to override this methodes if they defines their
         own REGEX class constant."""
-        return self.REGEX
+        return cls.REGEX
 
     @property
     def help(self):

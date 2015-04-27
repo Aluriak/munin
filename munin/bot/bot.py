@@ -9,21 +9,26 @@
 #########################
 import irc.bot
 import irc.strings
-try:
-    from munin.configuration import SERVER, PORT, CHANNEL, NICKNAME, REALNAME, PASSWORD
-except:
-    print('No config file found !\nPlease create your own like munin/configuration_template.py named munin/configuration.py.')
-    exit(0)
+import irc.client
 import re
 import time
 import threading
-#from functionnality import GithubWatcher
+
+import munin.config
+
+try:
+    from munin.configuration import SERVER, PORT, CHANNEL, NICKNAME, REALNAME
+    from munin.configuration import PASSWORD, CHECK_TIME
+except ImportError:
+    print('No config file found !\nPlease create your own like munin/configuration_template.py named munin/configuration.py.')
+    exit(0)
 
 
 
 #########################
 # PRE-DECLARATIONS      #
 #########################
+LOGGER = munin.config.logger()
 
 
 
@@ -38,23 +43,26 @@ class Bot(irc.bot.SingleServerIRCBot):
         function regex() -> a re compiled regex object
         function do_command(bot, regex_findall) -> 
     """
-    CHECK_TIME = 5 # time between two functionnalities check
 
 
 # CONSTRUCTOR #################################################################
-    def __init__(self, nickname=NICKNAME, realname=REALNAME, server=SERVER, port=PORT, channel=CHANNEL):
+    def __init__(self, nickname=NICKNAME, realname=REALNAME, 
+                 server=SERVER, port=PORT, channel=CHANNEL, 
+                 check_time=CHECK_TIME):
         super().__init__([(server, port)], nickname, realname)
         self.functionnalities = set()
         self.channel   = channel
         self.nickname  = nickname
         self.__sudoers = {'aluriak', 'DrIDK'}
+        self.check_time= check_time
 
         # check Functionnalities, if some have something to say
+        def wait(): time.sleep(self.check_time)
         def check_timer(bot_instance):
-            time.sleep(Bot.CHECK_TIME)
+            wait()
             while bot_instance.is_connected():
                 bot_instance.check_functionnalities()
-                time.sleep(Bot.CHECK_TIME)
+                wait()
         self.check_func_thread = threading.Thread(target=check_timer, args=[self])
         self.check_func_thread.start()
 
@@ -64,13 +72,18 @@ class Bot(irc.bot.SingleServerIRCBot):
         """"""
         if private is True: assert(private is True and dest is not None)
         assert(msg is not None)
-        if private is True:
-            self.connection.privmsg(dest, msg)
-        else:
-            if dest in (None, ''):
-                self.connection.privmsg(self.channel, msg)
+        assert(msg is not '')
+        try:
+            if private is True:
+                self.connection.privmsg(dest, msg)
             else:
-                self.connection.privmsg(self.channel, dest + ': ' + msg)
+                if dest in (None, ' ', ''):
+                    self.connection.privmsg(self.channel, msg)
+                else:
+                    self.connection.privmsg(self.channel, dest + ': ' + msg)
+        except irc.client.MessageTooLong:
+            logger.warning('ERROR: too long message')
+            self.connection.privmsg(self.channel, 'too long message')
         return None
 
     def add_functionnality(self, func):
@@ -87,25 +100,30 @@ class Bot(irc.bot.SingleServerIRCBot):
         """add given name to sudoers"""
         self.__sudoers.add(name)
 
-    def log(self, log_msg):
-        """logging"""
-        print('LOG: ' + log_msg)
-
-    def do_command(self, command, author=None):
-        """send command to functionnalities"""
+    def do_command(self, message, author=None):
+        """send message to functionnalities"""
         for fnc in self.functionnalities:
-            if fnc.regex is not None:
-                matching = re.fullmatch(fnc.regex, command)
-                if matching is not None:
-                    responses = fnc.do_command(self, matching.groups(), sudo=author in self.__sudoers, author=author)
-                    for response in responses.split('\n'):
-                        self.send_message(response)
-
+            # shortcuts
+            sudo = author in self.__sudoers
+            accepted = fnc.accept_message(message, sudo, author)
+            # if functionnality accept the message, call it and send messages
+            if accepted is not None:
+                responses = (_ for _ in 
+                             fnc.do_command(self, message,
+                                            accepted.groups(),
+                                            sudo, author
+                                           ).split('\n')
+                             if len(_) > 0
+                )
+                [self.send_message(r) for r in responses]
 
     def disconnect(self):
         """Disconnect from IRC, and finish"""
-        print('I\'M KILLED !!')
-        self.connection.quit('Good Bye !')
+        LOGGER.info('disconnected from IRC')
+        try:
+            self.connection.quit('Good Bye !')
+        except irc.client.ServerNotConnectedError:
+            pass
         self.check_func_thread.join()
         self.die()
 
@@ -114,20 +132,20 @@ class Bot(irc.bot.SingleServerIRCBot):
     def on_nicknameinuse(self, c, e):
         """If nickname already used, add _ at the end and go on"""
         self.nickname = self.nickname + '_'
-        self.log('nickname used, switch to ' + self.nickname)
+        LOGGER.warning('nickname used, switch to ' + self.nickname)
         c.nick(self.nickname)
 
     def on_welcome(self, c, e):
         """When connected to server, join targeted channel"""
         c.join(self.channel)
         self.connection = c
-        self.log('connect to ' + self.channel)
+        LOGGER.info('connect to ' + self.channel)
 
     def on_privmsg(self, c, e):
         assert(c == self.connection)
         author = e.source.nick
         message = e.arguments[0]
-        self.log(author + ' published: ' + message)
+        LOGGER.info(author + ' published: ' + message)
 
     def on_pubmsg(self, c, e):
         """Call functionnality if message is a command message"""
@@ -136,18 +154,17 @@ class Bot(irc.bot.SingleServerIRCBot):
         all_message = e.arguments[0]
 
         # get target of msg and msg itself
-        if re.fullmatch(re.compile('^' + self.nickname + ": .*") , all_message):
+        if all_message.startswith(self.nickname + ':'):
             dest, message = all_message.split(':', 1)
             assert(dest+':'+message == all_message)
         else:
             dest, message = None, all_message
-        self.log(author + ' published: ' + message + ((' for '+dest) if dest is not None else ''))
+        LOGGER.info(author + ': ' + message + ((' for '+dest) if dest is not None else ''))
 
-        # launch command (as sudo if necessary)
-        #print(dest, message)
-        #print('matched !', '[SUDO]' if author in self.__sudoers else '') 
-        self.do_command(message, author)
-        
+        # lookup functionnalities for received command 
+        if dest == self.nickname:
+            self.do_command(message, author)
+
 
 
 
