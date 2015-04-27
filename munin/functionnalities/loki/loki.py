@@ -50,12 +50,10 @@ class Loki(Functionnality):
         regres = Loki.REGEX_RGX.fullmatch(target)
         if regres is not None:
             # author need a pervert version
-            print (self.last_words, target, author)
             regres = regres.groups()[0]
-            print (regres)
             if regres in self.last_words:
                 results = Loki._turn_pervert(self.last_words[regres])
-            return results +"arrivé"
+            return results
         else:
             # get last message of author
             self.last_words[author] = target
@@ -88,10 +86,10 @@ class Loki(Functionnality):
     def _blague():
         f = open("data/blagues.txt", 'r')
         lignes = f.readlines()
-        f.close()
         compilation = []
         for l in lignes:
             compilation.append(l)
+        f.close()
         return compilation[random.randint(0, len(compilation)-1)]
 
 # PREDICATS #
