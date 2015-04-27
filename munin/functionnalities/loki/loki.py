@@ -9,6 +9,7 @@
 ###########
 from munin.functionnalities import Functionnality
 import re
+import random
 
 
 ####################
@@ -51,8 +52,7 @@ class Loki(Functionnality):
             # author need a pervert version
             regres = regres.groups()
             if target in self.last_words:
-                normal_sentence = self.last_words[target]
-                result = _turn_pervert(norm)
+                result = _turn_pervert(self.last_words[target])
         else:
             # get last message of author
             self.last_words[author] = target
@@ -63,7 +63,21 @@ class Loki(Functionnality):
 # PRIVATE METHODS #
 ###################
     def _turn_pervert(base):
+        if "ma" in base:
+            print "TO DO"
+        else:
+            return "Je suis désolé, mais là pour le coup, je ne trouve rien à\
+        dire, donc du coup je vais raconter une blague!\n"+_blague()
 
+
+    def _blague():
+        f = open(blagues.txt, 'r')
+        lignes = f.readlines()
+        f.close()
+        compilation = []
+        for l in lignes:
+            compilation.append(l)
+        return compilation[random.randint(0, len(compilation)-1)]
 
 # PREDICATS #
 
