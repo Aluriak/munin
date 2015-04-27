@@ -63,15 +63,26 @@ class Loki(Functionnality):
 # PRIVATE METHODS #
 ###################
     def _turn_pervert(base):
-        if "ma" in base:
-            print "TO DO"
+        key=("ma",  "mes",  "mon")
+        reco = tuple((j, j.index()) for j in base.split(" ") if j in key)
+        if reco != ():
+            return _change(base,  reco[-1])
         else:
             return "Je suis désolé, mais là pour le coup, je ne trouve rien à\
         dire, donc du coup je vais raconter une blague!\n"+_blague()
 
+    def _change(phrase, mot):
+        borne=phrase.find(mot)
+        if mot == "ma":
+            return phrase[0:borne]+"bite "+phrase[borne+3:]
+        elif mot == "mes":
+            return phrase[0:borne]+"baballes "+phrase[borne+4:]
+        elif mot == "mon":
+            return phrase[0:borne]+"cul "+phrase[borne+4:]
+
 
     def _blague():
-        f = open(blagues.txt, 'r')
+        f = open("blagues.txt", 'r')
         lignes = f.readlines()
         f.close()
         compilation = []
