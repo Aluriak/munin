@@ -17,13 +17,13 @@ import os
 
 from logging.handlers       import RotatingFileHandler
 from munin.functionnalities import Functionnality
+from munin.info             import PKG_NAME
 
 
 
 #########################
 # PRE-DECLARATIONS      #
 #########################
-PKG_NAME = 'munin'
 
 
 #########################
