@@ -22,6 +22,7 @@ RGX_SUDOERS_ADD = re.compile(r"\s*sudoers\s+add\s*([a-zA-Z0-9_]*)\s*")
 RGX_DISCONNECT  = re.compile(r"\s*(quit|:q)\s*")
 RGX_SPEAK       = re.compile(r"\s*say\s(.*)")
 RGX_PLUGINS     = re.compile(r"\s*(plugins?|pl?g)\s(.*)")
+RGX_LAST_WORDS  = re.compile(r"\s*irc\s(.*)")
 
 # PRINTINGS
 PRINTINGS_PLUGINS_MAX_WIDTH = 20
@@ -47,6 +48,7 @@ class Control():
             RGX_DISCONNECT  : self.__bot_disconnect,
             RGX_SPEAK       : self.__bot_speak,
             RGX_PLUGINS     : self.__plugins,
+            RGX_LAST_WORDS  : self.__last_words,
         }
 
         # launch bot as thread
@@ -126,11 +128,13 @@ class Control():
 
         # listing
         if command in ('list', 'l', 'ls'):
+            # each plugin will be shown with a [ACTIVATED] flag
+            #  if already present of munin
             plugins = ((
-                        (p.__name__[:PRINTINGS_PLUGINS_MAX_WIDTH] 
-                         + ' ' * (PRINTINGS_PLUGINS_MAX_WIDTH 
+                        (p.__name__[:PRINTINGS_PLUGINS_MAX_WIDTH]
+                         + ' ' * (PRINTINGS_PLUGINS_MAX_WIDTH
                                   - len(p.__name__[:PRINTINGS_PLUGINS_MAX_WIDTH])
-                                 ) 
+                                 )
                          + '\t[ACTIVATED]'
                         )
                         if p in self.bot else p.__name__
@@ -165,6 +169,11 @@ class Control():
         # error output
         if error is not None:
             print('ERROR:', error_code[error])
+
+
+    def __last_words(self, regex_result):
+        """Show last words of IRC"""
+        raise NotImplemented
 
 
 # PREDICATS ###################################################################
