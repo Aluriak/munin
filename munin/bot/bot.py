@@ -2,7 +2,14 @@
 #########################
 #       BOT             #
 #########################
+"""
+The IRC Bot itself.
 
+Derived of IRCBot class of irclib,
+it provide lots of tools and automatize many behaviors.
+
+Can be controlled by Control instances.
+"""
 
 #########################
 # IMPORTS               #

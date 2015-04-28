@@ -2,7 +2,11 @@
 #########################
 #      PLUGINS          #
 #########################
+"""
+Definition of the base class Plugin.
 
+Plugins system allow Munin IRC Bot to be fully extendable.
+"""
 
 #########################
 # IMPORTS               #

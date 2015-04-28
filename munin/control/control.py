@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
 #########################
-#       CONTROL            
+#       CONTROL         #
 #########################
+"""
+Define the controller of the Bot itself.
+
+The controller provide a full command line interface for administration:
+    - dynamic plugins
+    - IRC interactions
+    - sudoers management
+"""
 
 
 #########################

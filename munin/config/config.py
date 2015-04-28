@@ -3,7 +3,8 @@
 #       CONFIG          #
 #########################
 """
-Definitions of default configurations, mainly about logging.
+Definitions of default configurations, 
+mainly about logging and plugin importing.
 """
 
 #########################
