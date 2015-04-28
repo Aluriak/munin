@@ -18,6 +18,7 @@ import os
 
 from logging.handlers import RotatingFileHandler
 from munin.plugin     import Plugin
+from munin.info       import PKG_NAME
 
 
 
