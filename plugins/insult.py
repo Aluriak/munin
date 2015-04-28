@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
  
 # imports
-from munin.functionnalities import Functionnality
+from munin.plugin import Plugin
 from random import randint, choice
 import re
  
 # Class         : Insulte
 # Resume        : Get some love from a bot you poor little boy/girl
-class Insult(Functionnality):
+class Insult(Plugin):
         """
         Insult someone with style
         example:

@@ -7,7 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
-from munin.functionnalities import Functionnality
+from munin.plugin import Plugin
 import pickle
 import re
 
@@ -22,9 +22,9 @@ import re
 #########################
 # TODOLIST              #
 #########################
-class TodoList(Functionnality):
+class TodoList(Plugin):
     """
-    Advanced Functionnality application.
+    Advanced Plugin application.
     """
     REGEX     = re.compile(r" *to?do? (.+)")
     FEATURES  = {} # dict of regex:method, initialized in __init__

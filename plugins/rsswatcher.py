@@ -7,7 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
-from munin.functionnalities import Functionnality
+from munin.plugin import Plugin
 import concurrent.futures
 import feedparser
 import threading
@@ -26,9 +26,9 @@ import re
 #########################
 # RSSWATCHER            #
 #########################
-class RssWatcher(Functionnality):
+class RssWatcher(Plugin):
     """
-    Advanced Functionnality application.
+    Advanced Plugin application.
     RSS feed observer. Unprotected use of threads for watch given 
     feeds, and report news on the chan.
     Need to be rewrite for take care of data racing, especially about 
