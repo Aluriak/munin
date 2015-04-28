@@ -7,7 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
-from munin.functionnalities import Functionnality
+from munin.plugin import Plugin
 import re
 
 
@@ -22,10 +22,10 @@ import re
 #########################
 # CLASS                 #
 #########################
-class Helper(Functionnality):
+class Helper(Plugin):
     """
-    Simple Functionnality application.
-    Provide some help on current bot functionnalities.
+    Simple Plugin application.
+    Provide some help on current bot plugins.
     """
     REGEX = re.compile(r"\s*help([0-9 ]+)*\s*")
 
@@ -45,13 +45,13 @@ class Helper(Functionnality):
                 'This bot can be found as source code here: '+
                 'http://github.com/aluriak/munin\n' 
                 + ' ; '.join((str(i) + ':' + f.__class__.__name__ 
-                              for i, f in enumerate(bot.functionnalities))
+                              for i, f in enumerate(bot.plugins))
                             )
             )
         else: 
-            # matched_groups have a number that correspond maybe to a functionnality
+            # matched_groups have a number that correspond maybe to a plugin
             indexes = {int(_) for _ in matched_groups[0].split(' ') if _ is not ''}
-            results = '\n'.join((f.help for i, f in enumerate(bot.functionnalities) if i in indexes))
+            results = '\n'.join((f.help for i, f in enumerate(bot.plugins) if i in indexes))
         return results
 
 
@@ -60,7 +60,7 @@ class Helper(Functionnality):
 # ACCESSORS ###################################################################
     @property
     def help(self):
-        return "HELPER: wait for 'help [n]' command, for general help or about bot or its functionnalities."
+        return "HELPER: wait for 'help [n]' command, for general help or about bot or its plugins."
 # CONVERSION ##################################################################
 # OPERATORS ###################################################################
 
