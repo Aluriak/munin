@@ -47,20 +47,15 @@ class Control():
         self.bot_thread = threading.Thread(target=self.bot.start)
         self.bot_thread.start()
 
-        # Initial functionnalities
+        # Initial plugins
+        self.available_plugins = tuple(
+            config.import_plugins()
+        )
 
-        self.available_functionnalities = munin.config.import_functionnalities()
-        # self.available_functionnalities = [f for f in (getattr(fnct, a) for a in fnct.__dir__())
-                                           # if callable(f) and issubclass(f, fnct.Functionnality) 
-                                           # # and f.__class__ is not fnct.Functionnality
-                                           # # and 'functionnality' not in f.__class__.__name__.lower()
-                                           # and 'functionnality' not in f.__name__.lower()
-                                           # # and f.__class__.__name__ != fnct.Functionnality.__name__
-                                           # # and 'functionnality' not in super(f).__class__.__name__.lower()
-                                          # ]
-        for f in self.available_functionnalities:
-            self.bot.add_functionnality(f())
-            LOGGER.info('FUNCTIONNALITY LOADED: ' + f.__name__)
+        # Add whitelisted automatically # TODO
+        for f in self.available_plugins:
+            self.bot.add_plugin(f())
+            LOGGER.info('PLUGIN LOADED: ' + f.__name__)
 
         # main control buckle
         LOGGER.info('Connected !')

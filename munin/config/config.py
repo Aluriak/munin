@@ -15,15 +15,16 @@ import logging
 import glob
 import os
 
-from logging.handlers       import RotatingFileHandler
-from munin.functionnalities import Functionnality
+from logging.handlers import RotatingFileHandler
+from munin.plugin     import Plugin
 
 
 
 #########################
 # PRE-DECLARATIONS      #
 #########################
-PKG_NAME = 'munin'
+PKG_NAME        = 'munin'
+DIR_PLUGINS     = 'plugins'
 
 
 #########################
@@ -33,7 +34,7 @@ def logger(name=''):
     """Return logger of munin
 
     If name is provided, it will be registered like a submodule of munin.
-    Adapted for Functionnalities.
+    Adapted for Plugins.
     """
     import munin.config.conflog as conflog
     logger_name = conflog.LOGGER_NAME

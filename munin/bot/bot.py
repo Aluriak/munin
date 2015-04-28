@@ -37,9 +37,9 @@ LOGGER = munin.config.logger()
 #########################
 class Bot(irc.bot.SingleServerIRCBot):
     """
-    IRC bot designed for functionnality improvements. 
+    IRC bot designed for plugin improvements. 
 
-    self.functionnalities associate a regex to an object that have that API:
+    self.plugins associate a regex to an object that have that API:
         function regex() -> a re compiled regex object
         function do_command(bot, regex_findall) -> 
     """
@@ -50,18 +50,18 @@ class Bot(irc.bot.SingleServerIRCBot):
                  server=SERVER, port=PORT, channel=CHANNEL, 
                  check_time=CHECK_TIME):
         super().__init__([(server, port)], nickname, realname)
-        self.functionnalities = set()
+        self.plugins = set()
         self.channel   = channel
         self.nickname  = nickname
         self.__sudoers = {'aluriak', 'DrIDK'}
         self.check_time= check_time
 
-        # check Functionnalities, if some have something to say
+        # check Plugins, if some have something to say
         def wait(): time.sleep(self.check_time)
         def check_timer(bot_instance):
             wait()
             while bot_instance.is_connected():
-                bot_instance.check_functionnalities()
+                bot_instance.check_plugins()
                 wait()
         self.check_func_thread = threading.Thread(target=check_timer, args=[self])
         self.check_func_thread.start()
@@ -101,12 +101,12 @@ class Bot(irc.bot.SingleServerIRCBot):
         self.__sudoers.add(name)
 
     def do_command(self, message, author=None):
-        """send message to functionnalities"""
-        for fnc in self.functionnalities:
+        """send message to plugins"""
+        for fnc in self.plugins:
             # shortcuts
             sudo = author in self.__sudoers
             accepted = fnc.accept_message(message, sudo, author)
-            # if functionnality accept the message, call it and send messages
+            # if plugin accept the message, call it and send messages
             if accepted is not None:
                 responses = (_ for _ in 
                              fnc.do_command(self, message,
@@ -148,7 +148,7 @@ class Bot(irc.bot.SingleServerIRCBot):
         LOGGER.info(author + ' published: ' + message)
 
     def on_pubmsg(self, c, e):
-        """Call functionnality if message is a command message"""
+        """Call plugin if message is a command message"""
         assert(c == self.connection)
         author = e.source.nick
         all_message = e.arguments[0]
@@ -161,7 +161,7 @@ class Bot(irc.bot.SingleServerIRCBot):
             dest, message = None, all_message
         LOGGER.info(author + ': ' + message + ((' for '+dest) if dest is not None else ''))
 
-        # lookup functionnalities for received command 
+        # lookup plugins for received command 
         if dest == self.nickname:
             self.do_command(message, author)
 

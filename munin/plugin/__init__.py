@@ -1,2 +1,1 @@
-# master class
-from munin.functionnalities.functionnalities import Functionnality
+from munin.plugin.plugin import Plugin
