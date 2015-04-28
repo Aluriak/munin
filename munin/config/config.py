@@ -50,32 +50,54 @@ def logger(name=''):
 #########################
 # IMPORT USER CLASSES   #
 #########################
-def import_functionnalities():
-    """Import all modules in subdirectory of munin functionnalities directory.
+def plugin_class_check(cls):
+    """Return True iff given cls is a valid plugin class"""
+    return (
+        issubclass(cls.__class__, type) and # its a class !
+        issubclass(cls, Plugin) and # its a plugin
+        cls is not Plugin           # but not Plugin itself
+    )
+
+
+def import_plugins():
+    """Import all modules in subdirectory of munin plugins directory.
 
     Return a generator of classes.
     """
-    def class_check(cls):
-        return (
-            issubclass(cls.__class__, type) and # its a class !
-            issubclass(cls, Functionnality) and # its a functionnality
-            cls is not Functionnality           # but not Functionnality itself
-        )
+    # collect all expected classes in userclasses list
+    classes = (import_plugin(module) for module in list_plugins())
+    return itertools.chain(*classes)
+
+
+def import_plugin(name, path=None, package=PKG_NAME):
+    """Return generator of plugin classes in module of given name.
+
+    Return None if any ImportError raised.
+    """
+    # get full path
+    if path is None:
+        path = name
+    else:
+        path += '/' + name
+    # importing
+    try:
+        # import user module
+        module = importlib.import_module(path, package=package)
+        # collect expected classes
+        classes = (module.__getattribute__(_) for _ in module.__dir__())
+        classes = (_ for _ in classes if plugin_class_check(_))
+    except ImportError:
+        classes = None
+    return classes
+
+
+def list_plugins():
+    """Return generator of plugin names that are detected and importables."""
     # open python modules in user classes directory
     # ex: 'A/B/C.py' -> 'A.B.C'
-    modules = (f.replace('/', '.').rstrip('.py')
-               for f in glob.glob('munin/functionnalities/*/'+'*.py')
-               if '__init__' not in f
-              )
-    # collect all expected classes in userclasses list
-    classes = []
-    for module in modules:
-        # import user module
-        module = importlib.import_module(module, package=PKG_NAME)
-        # collect expected classes
-        attributes = (module.__getattribute__(_) for _ in module.__dir__())
-        attributes = tuple(_ for _ in attributes if class_check(_))
-        classes.append(attributes)
+    return (f.rstrip('.py').replace('/', '.')
+            for f in glob.glob(DIR_PLUGINS + '/*.py')
+            if not f.startswith('_')
+           )
 
-    return itertools.chain(*classes)
 
