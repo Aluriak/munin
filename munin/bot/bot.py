@@ -27,7 +27,11 @@ try:
     from munin.configuration import SERVER, PORT, CHANNEL, NICKNAME, REALNAME
     from munin.configuration import PASSWORD, CHECK_TIME
 except ImportError:
-    print('No config file found !\nPlease create your own like munin/configuration_template.py named munin/configuration.py.')
+    print(
+        'No config file found !\n',
+        'Please create your own like munin/configuration_template.py',
+        'named munin/configuration.py.'
+    )
     exit(0)
 
 

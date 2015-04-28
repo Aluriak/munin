@@ -68,12 +68,12 @@ class Control():
             config.import_plugins()
         )
 
-        # Add whitelisted automatically # TODO
+        # Add whitelisted plugins automatically # TODO
         for f in self.available_plugins:
             self.bot.add_plugin(f())
             LOGGER.info('PLUGIN LOADED: ' + f.__name__)
 
-        # main control buckle
+        # main loop control
         LOGGER.info('Connected !')
         try:
             print("?>", end='')

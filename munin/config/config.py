@@ -50,7 +50,7 @@ def logger(name=''):
 
 
 #########################
-# IMPORT USER CLASSES   #
+# IMPORT USER CLASSES   #
 #########################
 def plugin_class_check(cls):
     """Return True iff given cls is a valid plugin class"""
