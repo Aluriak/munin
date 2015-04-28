@@ -86,13 +86,36 @@ class Bot(irc.bot.SingleServerIRCBot):
             self.connection.privmsg(self.channel, 'too long message')
         return None
 
-    def add_functionnality(self, func):
-        """Get instance of functionnality, and add it to the list of observers"""
-        self.functionnalities.add(func)
+    def add_plugin(self, func):
+        """Get instance of plugin, and add it to the list of observers"""
+        self.plugins.add(func)
 
-    def check_functionnalities(self):
-        """Check functionnalities, and give them a chance to speak"""
-        for func in self.functionnalities:
+    def rmv_plugin(self, func):
+        """remove given plugin
+        Return False iff KeyError.
+        """
+        removed = True
+        try:
+            self.plugins.remove(func)
+        except KeyError:
+            removed = False
+        return removed
+
+    def rmv_index(self, index):
+        """remove plugins with given index
+        Return False iff no plugin removed.
+        """
+        before = len(self.plugins)
+        self.plugins = {
+            f
+            for f in self.plugins
+            if f.id != index
+        }
+        return len(self.plugins) != before
+
+    def check_plugins(self):
+        """Check plugins, and give them a chance to speak"""
+        for func in self.plugins:
             if func.want_speak():
                 self.send_message(func.say_something())
 
@@ -178,6 +201,11 @@ class Bot(irc.bot.SingleServerIRCBot):
 # ACCESSORS ###################################################################
 # CONVERSION ##################################################################
 # OPERATORS ###################################################################
+    def __contains__(self, o):
+        """Return True iff o is a Plugin subclass that have 
+        an instance in currently runned plugins.
+        """
+        return any(o is p.__class__ for p in self.plugins)
 
 
 
