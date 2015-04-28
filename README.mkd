@@ -19,15 +19,24 @@ Some examples are provided :
 
 ## Nexts improvements
 Functionnalities:  
-- prolog database, for do… things;
-- git watcher, for channel notification at events on a repo;
-- admin panel, for managing munin things;
+-[ ] ASP database, for do… things;
+-[ ] discussion profiling;
+-[ ] leave message to other peoples;
+-[ ] search definition of words of wikidata;
+-[ ] admin panel, for managing munin things;
   
 Local Admin:  
-- white/black lists of functionnalities to run by default:
-- more prompt commands;
-- better prompt;
+-[ ] white/black lists of functionnalities to run by default;
+-[ ] more prompt commands : add sudoers, (un)plug Functionnality;
+-[ ] better prompt;
 
+Others:
+-[ ] rename Functionnality to Plugin;
+-[ ] place Plugin outside munin subdirectories;
+
+Maybe a day:
+-[ ] allow ada modules;
+-[ ] rewrite core in ada;
 
 ## Start an instance of munin
 First, you need to creat a munin/configuration.py file:
@@ -38,4 +47,16 @@ Edit it for have your bot as expected:
 
         vim munin/configuration.py
 
+
+## Changelog
+- 0.2.0:
+  - one more argument for Functionnality.do\_command method;
+  - automatic import with importlib;
+  - proper logging with logging module;
+  - some core optimizations;
+
+
+
+## Contribute
+Please fork and propose pull requests.
 
