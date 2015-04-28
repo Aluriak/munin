@@ -43,7 +43,7 @@ class RssWatcher(Functionnality):
 # CONSTRUCTOR #################################################################
     def __init__(self, urls=None, savefile=SAVE_FILE_DEFAULT, temporization=10):
         """Optionnaly wait for a list of rss feed url and a filename."""
-        super(Functionnality).__init__()
+        super().__init__()
         self.news = []
         self.savefile = (RssWatcher.SAVE_FILE_PREFIX 
                          + savefile 
