@@ -7,7 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
-from munin.functionnalities import Functionnality
+from munin.plugin import Plugin
 import re
 
 
@@ -22,9 +22,9 @@ import re
 #########################
 # CLASS                 #
 #########################
-class Corrector(Functionnality):
+class Corrector(Plugin):
     """
-    Simple Functionnality application.
+    Simple Plugin application.
     Repeat last sentence of user that correct it by using a regex.
     example:
         lucas| hellp

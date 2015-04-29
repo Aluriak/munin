@@ -2,7 +2,14 @@
 #########################
 #       BOT             #
 #########################
+"""
+The IRC Bot itself.
 
+Derived of IRCBot class of irclib,
+it provide lots of tools and automatize many behaviors.
+
+Can be controlled by Control instances.
+"""
 
 #########################
 # IMPORTS               #
@@ -20,7 +27,11 @@ try:
     from munin.configuration import SERVER, PORT, CHANNEL, NICKNAME, REALNAME
     from munin.configuration import PASSWORD, CHECK_TIME
 except ImportError:
-    print('No config file found !\nPlease create your own like munin/configuration_template.py named munin/configuration.py.')
+    print(
+        'No config file found !\n',
+        'Please create your own like munin/configuration_template.py',
+        'named munin/configuration.py.'
+    )
     exit(0)
 
 
@@ -37,9 +48,9 @@ LOGGER = munin.config.logger()
 #########################
 class Bot(irc.bot.SingleServerIRCBot):
     """
-    IRC bot designed for functionnality improvements. 
+    IRC bot designed for plugin improvements. 
 
-    self.functionnalities associate a regex to an object that have that API:
+    self.plugins associate a regex to an object that have that API:
         function regex() -> a re compiled regex object
         function do_command(bot, regex_findall) -> 
     """
@@ -50,18 +61,18 @@ class Bot(irc.bot.SingleServerIRCBot):
                  server=SERVER, port=PORT, channel=CHANNEL, 
                  check_time=CHECK_TIME):
         super().__init__([(server, port)], nickname, realname)
-        self.functionnalities = set()
+        self.plugins = set()
         self.channel   = channel
         self.nickname  = nickname
         self.__sudoers = {'aluriak', 'DrIDK'}
         self.check_time= check_time
 
-        # check Functionnalities, if some have something to say
+        # check Plugins, if some have something to say
         def wait(): time.sleep(self.check_time)
         def check_timer(bot_instance):
             wait()
             while bot_instance.is_connected():
-                bot_instance.check_functionnalities()
+                bot_instance.check_plugins()
                 wait()
         self.check_func_thread = threading.Thread(target=check_timer, args=[self])
         self.check_func_thread.start()
@@ -82,17 +93,40 @@ class Bot(irc.bot.SingleServerIRCBot):
                 else:
                     self.connection.privmsg(self.channel, dest + ': ' + msg)
         except irc.client.MessageTooLong:
-            logger.warning('ERROR: too long message')
+            LOGGER.warning('ERROR: too long message')
             self.connection.privmsg(self.channel, 'too long message')
         return None
 
-    def add_functionnality(self, func):
-        """Get instance of functionnality, and add it to the list of observers"""
-        self.functionnalities.add(func)
+    def add_plugin(self, func):
+        """Get instance of plugin, and add it to the list of observers"""
+        self.plugins.add(func)
 
-    def check_functionnalities(self):
-        """Check functionnalities, and give them a chance to speak"""
-        for func in self.functionnalities:
+    def rmv_plugin(self, func):
+        """remove given plugin
+        Return False iff KeyError.
+        """
+        removed = True
+        try:
+            self.plugins.remove(func)
+        except KeyError:
+            removed = False
+        return removed
+
+    def rmv_index(self, index):
+        """remove plugins with given index
+        Return False iff no plugin removed.
+        """
+        before = len(self.plugins)
+        self.plugins = {
+            f
+            for f in self.plugins
+            if f.id != index
+        }
+        return len(self.plugins) != before
+
+    def check_plugins(self):
+        """Check plugins, and give them a chance to speak"""
+        for func in self.plugins:
             if func.want_speak():
                 self.send_message(func.say_something())
 
@@ -101,12 +135,12 @@ class Bot(irc.bot.SingleServerIRCBot):
         self.__sudoers.add(name)
 
     def do_command(self, message, author=None):
-        """send message to functionnalities"""
-        for fnc in self.functionnalities:
+        """send message to plugins"""
+        for fnc in self.plugins:
             # shortcuts
             sudo = author in self.__sudoers
             accepted = fnc.accept_message(message, sudo, author)
-            # if functionnality accept the message, call it and send messages
+            # if plugin accept the message, call it and send messages
             if accepted is not None:
                 responses = (_ for _ in 
                              fnc.do_command(self, message,
@@ -148,7 +182,7 @@ class Bot(irc.bot.SingleServerIRCBot):
         LOGGER.info(author + ' published: ' + message)
 
     def on_pubmsg(self, c, e):
-        """Call functionnality if message is a command message"""
+        """Call plugin if message is a command message"""
         assert(c == self.connection)
         author = e.source.nick
         all_message = e.arguments[0]
@@ -161,7 +195,7 @@ class Bot(irc.bot.SingleServerIRCBot):
             dest, message = None, all_message
         LOGGER.info(author + ': ' + message + ((' for '+dest) if dest is not None else ''))
 
-        # lookup functionnalities for received command 
+        # lookup plugins for received command 
         if dest == self.nickname:
             self.do_command(message, author)
 
@@ -178,6 +212,11 @@ class Bot(irc.bot.SingleServerIRCBot):
 # ACCESSORS ###################################################################
 # CONVERSION ##################################################################
 # OPERATORS ###################################################################
+    def __contains__(self, o):
+        """Return True iff o is a Plugin subclass that have 
+        an instance in currently runned plugins.
+        """
+        return any(o is p.__class__ for p in self.plugins)
 
 
 
