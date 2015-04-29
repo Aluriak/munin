@@ -9,3 +9,4 @@ lib/
 include/
 bin/
 lib64
+.rope*
