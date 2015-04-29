@@ -93,7 +93,7 @@ class Bot(irc.bot.SingleServerIRCBot):
                 else:
                     self.connection.privmsg(self.channel, dest + ': ' + msg)
         except irc.client.MessageTooLong:
-            logger.warning('ERROR: too long message')
+            LOGGER.warning('ERROR: too long message')
             self.connection.privmsg(self.channel, 'too long message')
         return None
 
