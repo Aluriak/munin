@@ -89,7 +89,7 @@ def import_plugin(name, path=None, package=PKG_NAME):
         classes = (module.__getattribute__(_) for _ in module.__dir__())
         classes = (_ for _ in classes if plugin_class_check(_))
     except ImportError:
-        classes = (_ for _ in (,))
+        classes = tuple()
     return classes
 
 
