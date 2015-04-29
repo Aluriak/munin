@@ -1,4 +1,3 @@
-Session.vim
 munin/configuration.py
 *.pyc
 *.log*
