@@ -156,7 +156,7 @@ class Control():
                 print(str(fn))
         # activation
         elif command in ('activate', 'a', 'ac'):
-            if len(values) > 1:
+            if len(values) > 0:
                 for name in values:
                     clss = config.import_plugin(name)
                     for cls in clss:
