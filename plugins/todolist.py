@@ -7,7 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
-from munin.functionnalities import Functionnality
+from munin.plugin import Plugin
 import pickle
 import re
 
@@ -22,9 +22,9 @@ import re
 #########################
 # TODOLIST              #
 #########################
-class TodoList(Functionnality):
+class TodoList(Plugin):
     """
-    Advanced Functionnality application.
+    Advanced Plugin application.
     """
     REGEX     = re.compile(r" *to?do? (.+)")
     FEATURES  = {} # dict of regex:method, initialized in __init__
@@ -55,7 +55,7 @@ class TodoList(Functionnality):
 
 
 # PUBLIC METHODS ##############################################################
-    def do_command(self, bot, matched_groups, sudo=False, author=None):
+    def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
         """Execute command for bot (unused), according to regex matchs (used) and sudo mode (unused)"""
         if not sudo: return '' # sudo is needed
         results = ''
@@ -66,7 +66,7 @@ class TodoList(Functionnality):
             if regres is not None: # match !
                 results += feature(self, regres.groups()) or ''
 
-        return results 
+        return results
 
     def todolist_add(self, matched_groups):
         """add received string to todo list"""

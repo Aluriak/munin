@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 #########################
-#   FUNCTIONNALITIES    #
+#      PLUGINS          #
 #########################
+"""
+Definition of the base class Plugin.
 
+Plugins system allow Munin IRC Bot to be fully extendable.
+"""
 
 #########################
 # IMPORTS               #
@@ -19,33 +23,39 @@ import re
 
 
 #########################
-# CLASS                 #
+# PLUGIN BASE CLASS     #
 #########################
-class Functionnality():
+class Plugin():
     """
-    Body of a Functionnality implementation.
+    Body of a Plugin implementation.
     Inherit from this class is not useless, but not necessary:
     some treatments can be facilitate. (notabily automatic import)
 
     It just show what is necessary with docstring.
-    Best examples are already created functionnalities.
-
-    Note that __init__.py of Functionnality module is dedicated 
-    to functionnality import. Use it for facilitate access to your 
-    functionnality from Control class.
+    Best examples are already created plugins.
     """
     # default REGEX that is used for determined if 
-    # functionnality must be called, and with whitch parameters.
-    REGEX = re.compile(r"")
+    # plugin must be called, and with whitch parameters.
+    REGEX   = re.compile(r"(.*)")
+    NEXT_ID = 1
 
 
 # CONSTRUCTOR #################################################################
     def __init__(self):
-        pass
+        self.id = Plugin.NEXT_ID
+        Plugin.NEXT_ID += 1
 
 
 # PUBLIC METHODS ##############################################################
-    def do_command(self, bot, matched_groups, sudo=False, author=None):
+    def accept_message(self, message, sudo=False, author=None):
+        """message is the complete message received from IRC
+        This method return None if Plugin don't need to 
+         react to the message.
+        Else, returned value will be received by do_command method.
+        """
+        return self.regex().fullmatch(message)
+
+    def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
         """Execute command for bot, according to regex matchs, sudo mode, and author
         
         Return a string that will be sended by the bot. Not that string
@@ -73,20 +83,25 @@ class Functionnality():
 
 
 # ACCESSORS ###################################################################
-    @property
-    def regex(self):
+    @classmethod
+    def regex(cls):
         """Return regex used for match and receive things about message
 
         Specializations don't have to override this methodes if they defines their
         own REGEX class constant."""
-        return self.REGEX
+        return cls.REGEX
 
     @property
     def help(self):
-        """Return short documentation about functionnality and its command, usability, interests,…"""
+        """Return short documentation about plugin and its command, usability, interests,…"""
         raise NotImplementedError
 
+
 # CONVERSION ##################################################################
+    def __str__(self):
+        return str(self.id) + ': ' + self.__class__.__name__
+
+
 # OPERATORS ###################################################################
 
 

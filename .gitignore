@@ -1,6 +1,7 @@
 Session.vim
 munin/configuration.py
 *.pyc
+*.log*
 __pycache__/
 .*.swp
 .*.swo

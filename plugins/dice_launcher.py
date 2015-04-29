@@ -7,7 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
-from munin.functionnalities import Functionnality
+from munin.plugin import Plugin
 from random import randint
 import re
 
@@ -23,9 +23,9 @@ import re
 #########################
 # CLASS                 #
 #########################
-class DiceLauncher(Functionnality):
+class DiceLauncher(Plugin):
     """
-    Simple Functionnality application.
+    Simple Plugin application.
     Wait for something like:
         3d8 1d9 2d20
     each set of dices are launched, and results are returned:
@@ -43,7 +43,7 @@ class DiceLauncher(Functionnality):
 
 
 # PUBLIC METHODS ##############################################################
-    def do_command(self, bot, matched_groups, sudo=False, author=None):
+    def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
         """Execute command for bot (unused), according to regex matchs (used) and sudo mode (unused)"""
         results = ''
         total   = 0

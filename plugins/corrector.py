@@ -7,7 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
-from munin.functionnalities import Functionnality
+from munin.plugin import Plugin
 import re
 
 
@@ -22,9 +22,9 @@ import re
 #########################
 # CLASS                 #
 #########################
-class Corrector(Functionnality):
+class Corrector(Plugin):
     """
-    Simple Functionnality application.
+    Simple Plugin application.
     Repeat last sentence of user that correct it by using a regex.
     example:
         lucas| hellp
@@ -42,8 +42,9 @@ class Corrector(Functionnality):
 
 
 # PUBLIC METHODS ##############################################################
-    def do_command(self, bot, matched_groups, sudo=False, author=None):
-        """Execute command for bot (unused), according to regex matchs (used) and sudo mode (unused)"""
+    def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
+        """Execute command for bot (unused), 
+        according to regex matchs (used) and sudo mode (unused)"""
         results = ''
         # if its a correction
         regres = Corrector.REGEX_RGX.fullmatch(matched_groups[0])
@@ -54,8 +55,12 @@ class Corrector(Functionnality):
                 try:
                     regex   = re.compile(regres[0])
                     replace = regres[1] if len(regres) > 1 else ''
-                    self.last_words[author] = re.sub(regex, replace, self.last_words[author])
-                    results = author + ' would say: ' + self.last_words[author]
+                    self.last_words[author] = re.sub(regex, 
+                                                     replace, 
+                                                     self.last_words[author]
+                                                    )
+                    results = self.last_words[author]
+                    results += ' «««« corrected ' + author + ' words'
                 except:
                     results = author + ' would say something i don\'t recognize'
         else:

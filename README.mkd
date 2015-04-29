@@ -3,39 +3,64 @@ IRC bot made in python 3.
 
 
 ## Interests
-Munin is fully extendable.  
-See [functionnalities](https://github.com/Aluriak/munin/blob/master/munin/functionnalities/dice_launcher/dice_launcher.py) for an example of functionnality, that is 
+Munin is fully extendable.
+See [plugins](https://github.com/Aluriak/munin/blob/master/munin/plugins/dice_launcher/dice_launcher.py) for an example of plugin, that is 
 added automatically at launch by Control module.
 
 
 ## Functionnality
-Create a functionnality pass by specialize the [Functionnality class](), and add an import to [functionnalities init file]().  
+Create a plugin pass by specialize the [Plugin class](), and add an import to [plugins init file]().  
 Some examples are provided :
 - dice launcher, for playing RPG on IRC;
 - corrector, because your last sentence need to be correct by regex;
-- helper, for print help about others functionnalities;
+- helper, for print help about others plugins;
 - todolist, for managing todolists;
 
 
-## Nexts improvements
-Functionnalities:  
-- prolog database, for do… things;
-- git watcher, for channel notification at events on a repo;
-- admin panel, for managing munin things;
-  
-Local Admin:  
-- white/black lists of functionnalities to run by default:
-- more prompt commands;
-- better prompt;
+## Nexts improvements (planned for 1.0.0)
+Plugins:
+- [ ] ASP database, for do… things;
+- [ ] discussion profiling;
+- [ ] leave message to other peoples;
+- [ ] search definition of words of wikidata;
 
+Local Admin:
+- [ ] white/black lists of plugins to run by default;
+- [ ] more prompt commands : add sudoers;
+- [X] more prompt commands : (un)plug Plugin;
+- [ ] better prompt;
+
+Others:
+- [X] rename Plugin to Plugin;
+- [X] place Plugin outside munin subdirectories;
+
+Maybe a day:
+- [ ] allow ada modules;
+- [ ] rewrite core in ada;
 
 ## Start an instance of munin
 First, you need to creat a munin/configuration.py file:
-        
+
         cp munin/configuration_template.py munin/configuration.py
 
 Edit it for have your bot as expected:
 
         vim munin/configuration.py
 
+
+## Changelog
+- 0.3.0:
+  - new functionnality arch;
+  - functionnality renamed to plugin;
+
+- 0.2.0:
+  - one more argument for Functionnality.do\_command method;
+  - automatic import with importlib;
+  - proper logging with logging module;
+  - some core optimizations;
+
+
+
+## Contribute
+Please fork and propose pull requests.
 
