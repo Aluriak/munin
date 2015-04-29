@@ -99,7 +99,7 @@ class Loki(Functionnality):
 #############
     @property
     def help(self):
-        return """TO DO"""
+        return """Change the last sentence of an user to something pervert. Command: munin: loki <target>"""
 
 
 # CONVERSION #
