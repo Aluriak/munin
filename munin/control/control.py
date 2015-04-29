@@ -64,12 +64,12 @@ class Control():
         self.bot_thread.start()
 
         # Initial plugins
-        self.available_plugins = tuple(
+        available_plugins = tuple(
             config.import_plugins()
         )
 
         # Add whitelisted plugins automatically # TODO
-        for f in self.available_plugins:
+        for f in available_plugins:
             self.bot.add_plugin(f())
             LOGGER.info('PLUGIN LOADED: ' + f.__name__)
 
