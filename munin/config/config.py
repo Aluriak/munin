@@ -74,7 +74,7 @@ def import_plugins():
 def import_plugin(name, path=None, package=PKG_NAME):
     """Return generator of plugin classes in module of given name.
 
-    Return None if any ImportError raised.
+    Return empty generator if any ImportError raised.
     """
     # get full path
     if path is None:
@@ -89,7 +89,7 @@ def import_plugin(name, path=None, package=PKG_NAME):
         classes = (module.__getattribute__(_) for _ in module.__dir__())
         classes = (_ for _ in classes if plugin_class_check(_))
     except ImportError:
-        classes = None
+        classes = (_ for _ in (,))
     return classes
 
 
