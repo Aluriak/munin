@@ -6,3 +6,6 @@ tt:
 
 irc:
 	watch tail -n 20 logs/munin.log
+
+ir:
+	tail -n 100 logs/munin.log
