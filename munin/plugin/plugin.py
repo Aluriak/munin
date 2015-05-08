@@ -34,7 +34,7 @@ class Plugin():
     It just show what is necessary with docstring.
     Best examples are already created plugins.
     """
-    # default REGEX that is used for determined if 
+    # default REGEX that is used for determined if
     # plugin must be called, and with whitch parameters.
     REGEX   = re.compile(r"(.*)")
     NEXT_ID = 1
@@ -49,7 +49,7 @@ class Plugin():
 # PUBLIC METHODS ##############################################################
     def accept_message(self, message, sudo=False, author=None):
         """message is the complete message received from IRC
-        This method return None if Plugin don't need to 
+        This method return None if Plugin don't need to
          react to the message.
         Else, returned value will be received by do_command method.
         """
@@ -57,7 +57,7 @@ class Plugin():
 
     def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
         """Execute command for bot, according to regex matchs, sudo mode, and author
-        
+
         Return a string that will be sended by the bot. Not that string
         will be cut in multiple messages in place of \n character.
         """
@@ -65,7 +65,7 @@ class Plugin():
 
     def say_something(self):
         """Say something. Called only when self.want_speak() returned True.
-        
+
         If a specialization don't have to tell something without order of anothers
         IRC users, this method don't need an overriding."""
         raise NotImplementedError
