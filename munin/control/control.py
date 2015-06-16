@@ -20,7 +20,7 @@ import cmd
 import re
 import munin.config as config
 # integrated command line
-from prompt_toolkit.contrib.shortcuts import get_input
+from prompt_toolkit.shortcuts import get_input
 from prompt_toolkit.contrib.regular_languages.compiler import compile as pt_compile
 
 
@@ -136,20 +136,6 @@ class Control():
             else:
                 print('not a valid command')
 
-        # try:
-            # print("?>", end='')
-            # cmd = input('')
-            # while not self.finished:
-                # self.finished = not self.bot.is_connected()
-                # self.do_command(cmd)
-                # if not self.finished:
-                    # print("?>", end='')
-                    # cmd = input('')
-        # except KeyboardInterrupt:
-            # self.bot.disconnect()
-        # except EOFError:
-            # self.bot.disconnect()
-
         LOGGER.info('Disconnected !')
         # finalize all treatments
         self.bot_thread.join()
@@ -175,8 +161,8 @@ class Control():
 
     def __say(self, regex_result):
         """print message in canal"""
-        self.bot.send_message(regex_result[0])
-        LOGGER.debug('Said:' + str(regex_result[0]))
+        self.bot.send_message(regex_result)
+        LOGGER.debug('Said:' + str(regex_result))
 
     def __plugins(self, subcmd, values):
         """management of plugins"""
