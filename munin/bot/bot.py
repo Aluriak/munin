@@ -19,7 +19,7 @@ from munin import ircmessage
 
 try:
     from munin.configuration import SERVER, PORT, CHANNEL, NICKNAME, REALNAME
-    from munin.configuration import PASSWORD, CHECK_TIME
+    from munin.configuration import PASSWORD, CHECK_TIME, SUDOERS
 except ImportError:
     print(
         'No config file found !\n',
@@ -53,13 +53,13 @@ class Bot(irc.bot.SingleServerIRCBot):
 # CONSTRUCTOR #################################################################
     def __init__(self, nickname=NICKNAME, realname=REALNAME, 
                  server=SERVER, port=PORT, channel=CHANNEL, 
-                 check_time=CHECK_TIME):
+                 check_time=CHECK_TIME, sudoers=SUDOERS):
         super().__init__([(server, port)], nickname, realname)
-        self.plugins = set()
-        self.channel   = channel
-        self.nickname  = nickname
-        self.__sudoers = {'aluriak', 'DrIDK'}
-        self.check_time= check_time
+        self.plugins    = set()  # activated plugins
+        self.channel    = channel
+        self.nickname   = nickname
+        self.sudoers    = sudoers
+        self.check_time = check_time
 
         # check Plugins, if some have something to say
         def wait(): time.sleep(self.check_time)
