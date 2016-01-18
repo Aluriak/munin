@@ -24,6 +24,7 @@ COMMAND_PLUGINS_ADD = ('add', 'a', 'activate')
 COMMAND_PLUGINS_DEL = ('deactivate', 'del', 'd', 'rm', 'r')
 COMMAND_PLUGINS_LS  = ('ls', 'l')
 COMMAND_PLUGINS_PRT = ('p', 'print')
+COMMAND_PLUGINS_RLD = ('reload', 'rl', 'rld')
 COMMAND_SUDO_ADD    = ('a', 'add')
 COMMAND_SUDO_DEL    = ('d', 'del', 'rm')
 # all commands, subcommands and other regex in a main dict
@@ -37,10 +38,11 @@ COMMAND_NAMES = {
     'subpgarg': COMMAND_PLUGINS_ADD + COMMAND_PLUGINS_DEL,
     'subpgnoa': COMMAND_PLUGINS_PRT + COMMAND_PLUGINS_LS,
     'args'    : ('.*',),
+    'help'    : ('help', 'h',),
 }
 # printings values
 PRINTINGS_PLUGINS_MAX_WIDTH = 20
-DEFAULT_INTRO  = 'Welcome to the munin shell. Type help or ? to list commands.\n'
+DEFAULT_INTRO  = 'Welcome to the munin shell. Type help or h to list commands.\n'
 DEFAULT_PROMPT = '?>'
 
 
@@ -90,14 +92,13 @@ class Control():
         self.bot_thread.start()
 
         # Initial plugins
-        available_plugins = tuple(
-            config.import_plugins()
-        )
+        self.available_plugins = tuple(p() for p in config.import_plugins())
 
         # Add whitelisted plugins automatically # TODO
-        for f in available_plugins:
-            self.bot.add_plugin(f())
-            LOGGER.info('PLUGIN LOADED: ' + f.__name__)
+        for plugin in self.available_plugins:
+            self.bot.add_plugin(plugin)
+            LOGGER.info('PLUGIN LOADED: ' + str(plugin))
+        assert all(self.active(f) for f in self.available_plugins)
 
         # main loop control
         LOGGER.info('Connected !')
@@ -168,17 +169,9 @@ class Control():
             assert(values is None)
             # each plugin will be shown with a [ACTIVATED] flag
             #  if already present of munin
-            plugins = ((
-                        (p.__name__[:PRINTINGS_PLUGINS_MAX_WIDTH]
-                         + ' ' * (PRINTINGS_PLUGINS_MAX_WIDTH
-                                  - len(p.__name__[:PRINTINGS_PLUGINS_MAX_WIDTH])
-                                 )
-                         + '\t[ACTIVATED]'
-                        )
-                        if p in self.bot else p.__name__
-                       )
-                       for p in config.import_plugins()
-                      )
+            activated_flag = '\t\t[ACTIVATED]'
+            plugins = (str(p) + (activated_flag if self.active(p) else '')
+                       for p in self.available_plugins)
             print('\n'.join(plugins))
         # printing
         if subcmd in COMMAND_PLUGINS_PRT:
@@ -188,11 +181,14 @@ class Control():
         # activation
         elif subcmd in COMMAND_PLUGINS_ADD:
             assert(values is not None)
+            values = set(int(_) for _ in values.split())
             if len(values) > 0:
-                for name in values:
-                    clss = config.import_plugin(name)
-                    for cls in clss:
-                        self.bot.add_plugin(cls())
+                requesteds = (p for p in self.available_plugins if p.id in values)
+                for requested in requesteds:
+                    if not self.bot.has_plugin(requested):
+                        self.bot.add_plugin(requested)
+                    else:
+                        print('PLUGINS: already active: ' + str(requested))
             else:
                 error = 'name'
         # deactivation
@@ -201,7 +197,7 @@ class Control():
             if len(values) > 0:
                 try:
                     for idx in (int(_) for _ in values):
-                        if not self.bot.rmv_index(idx):
+                        if not self.bot.del_plugin(idx=idx):
                             print(str(idx) + ' not found !')
                 except ValueError:
                     error = 'id'
@@ -219,6 +215,11 @@ class Control():
             raise NotImplementedError
         else:
             print('ERROR:', args, 'is not a valid number of message to display')
+
+    def active(self, plugin):
+        """True if given plugin is active, ie is referenced by bot"""
+        assert plugin in self.available_plugins
+        return self.bot.has_plugin(plugin)
 
 
 # PREDICATS ###################################################################
