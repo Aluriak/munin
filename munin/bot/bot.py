@@ -29,28 +29,13 @@ except ImportError:
     exit(0)
 
 
-
-#########################
-# PRE-DECLARATIONS      #
-#########################
-LOGGER = munin.config.logger()
+LOGGER = config.logger()
 
 
-
-#########################
-# CLASS                 #
-#########################
 class Bot(irc.bot.SingleServerIRCBot):
-    """
-    IRC bot designed for plugin improvements. 
-
-    self.plugins associate a regex to an object that have that API:
-        function regex() -> a re compiled regex object
-        function do_command(bot, regex_findall) -> 
-    """
+    """IRC bot designed for allowing plugin improvements"""
 
 
-# CONSTRUCTOR #################################################################
     def __init__(self, nickname=NICKNAME, realname=REALNAME, 
                  server=SERVER, port=PORT, channel=CHANNEL, 
                  check_time=CHECK_TIME, sudoers=SUDOERS):
@@ -91,31 +76,29 @@ class Bot(irc.bot.SingleServerIRCBot):
         return None
 
     def add_plugin(self, func):
-        """Get instance of plugin, and add it to the list of observers"""
+        """Get instance of plugin, and add it to the list of plugins"""
         self.plugins.add(func)
 
-    def rmv_plugin(self, func):
-        """remove given plugin
-        Return False iff KeyError.
-        """
-        removed = True
-        try:
-            self.plugins.remove(func)
-        except KeyError:
-            removed = False
-        return removed
+    def has_plugin(self, func):
+        """True if given plugin is used"""
+        return func in self.plugins
 
-    def rmv_index(self, index):
-        """remove plugins with given index
-        Return False iff no plugin removed.
+    def del_plugin(self, *, func=None, idx=None):
+        """remove given plugin, by reference xor id in the plugin dict.
+        Return True iff a plugin was removed.
         """
-        before = len(self.plugins)
-        self.plugins = {
-            f
-            for f in self.plugins
-            if f.id != index
-        }
-        return len(self.plugins) != before
+        assert bool(func) != bool(idx)  # one, and only one
+        if idx:
+            filtered_plugins = {p for p in self.plugins if p.id != idx}
+            removed = len(filtered_plugins) < len(self.plugins)
+            self.plugins = filtered_plugins
+            assert len(filtered_plugins) <= len(self.plugins)
+        if func:
+            try:
+                self.plugins.remove(func)
+            except KeyError:
+                removed = False
+        return removed
 
     def check_plugins(self):
         """Check plugins, and give them a chance to speak"""
@@ -125,22 +108,22 @@ class Bot(irc.bot.SingleServerIRCBot):
 
     def add_sudoer(self, name):
         """add given name to sudoers"""
-        self.__sudoers.add(name)
+        self.sudoers.add(name)
 
-    def do_command(self, message, author=None):
+    def do_command(self, message):
         """send message to plugins"""
-        for fnc in self.plugins:
+        for plugin in self.plugins:
+            if plugin.only_on_explicit_dest and message.dest != self.nickname:
+                continue  # the plugin is not interested by this message
             # shortcuts
-            sudo = author in self.__sudoers
-            accepted = fnc.accept_message(message, sudo, author)
+            sudo = message.author in self.sudoers
+            accepted = plugin.accept_message(message, sudo)
             # if plugin accept the message, call it and send messages
             if accepted is not None:
-                responses = (_ for _ in 
-                             fnc.do_command(self, message,
-                                            accepted.groups(),
-                                            sudo, author
-                                           ).split('\n')
-                             if len(_) > 0
+                responses = (r for r in plugin.do_command(self, message,
+                                                          accepted.groups(),
+                                                          sudo).split('\n')
+                             if len(r) > 0
                 )
                 [self.send_message(r) for r in responses]
 
@@ -169,28 +152,15 @@ class Bot(irc.bot.SingleServerIRCBot):
 
     def on_privmsg(self, c, e):
         assert(c == self.connection)
-        author = e.source.nick
-        message = e.arguments[0]
-        LOGGER.info(author + ' published: ' + message)
+        message = ircmessage.IRCMessage(e.arguments[0], e.source.nick)
+        LOGGER.info(author + ' published: ' + str(message))
 
     def on_pubmsg(self, c, e):
         """Call plugin if message is a command message"""
         assert(c == self.connection)
-        author = e.source.nick
-        all_message = e.arguments[0]
-
-        # get target of msg and msg itself
-        if all_message.startswith(self.nickname + ':'):
-            dest, message = all_message.split(':', 1)
-            assert(dest+':'+message == all_message)
-        else:
-            dest, message = None, all_message
-        LOGGER.info(author + ': ' + message + ((' for '+dest) if dest is not None else ''))
-
-        # lookup plugins for received command 
-        if dest == self.nickname:
-            self.do_command(message, author)
-
+        message = ircmessage.IRCMessage(e.arguments[0], e.source.nick)
+        LOGGER.info(message)
+        self.do_command(message)
 
 
     def is_connected(self):
