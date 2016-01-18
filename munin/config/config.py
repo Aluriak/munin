@@ -3,7 +3,7 @@
 #       CONFIG          #
 #########################
 """
-Definitions of default configurations, 
+Definitions of default configurations,
 mainly about logging and plugin importing.
 """
 
@@ -15,6 +15,7 @@ import itertools
 import logging
 import glob
 import os
+
 
 from logging.handlers import RotatingFileHandler
 from munin.plugin     import Plugin
