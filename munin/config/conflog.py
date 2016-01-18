@@ -19,7 +19,7 @@ LOGGER       = logging.getLogger(LOGGER_NAME)
 
 
 #########################
-# INIT LOGGING          #
+# INIT LOGGING          #
 #########################
 LOGGER.setLevel(logging.DEBUG)
 

@@ -16,25 +16,67 @@ The controller provide a full command line interface for administration:
 # IMPORTS               #
 #########################
 import threading
+import cmd
 import re
-
 import munin.config as config
-
+# integrated command line
+from prompt_toolkit.shortcuts import get_input
+from prompt_toolkit.contrib.regular_languages.compiler import compile as pt_compile
 
 
 #########################
 # PRE-DECLARATIONS      #
 #########################
-LOGGER          = config.logger()
-RGX_SUDOERS_ADD = re.compile(r"\s*sudoers\s+add\s*([a-zA-Z0-9_]*)\s*")
-RGX_DISCONNECT  = re.compile(r"\s*(quit|:q)\s*")
-RGX_SPEAK       = re.compile(r"\s*say\s(.*)")
-RGX_PLUGINS     = re.compile(r"\s*(plugins?|pl?g)\s(.*)")
-RGX_LAST_WORDS  = re.compile(r"\s*irc\s(.*)")
-
-# PRINTINGS
+LOGGER = config.logger()
+# list of reusable subcommands names
+COMMAND_PLUGINS_ADD = ('add', 'a', 'activate')
+COMMAND_PLUGINS_DEL = ('deactivate', 'del', 'd', 'rm', 'r')
+COMMAND_PLUGINS_LS  = ('ls', 'l')
+COMMAND_PLUGINS_PRT = ('p', 'print')
+COMMAND_SUDO_ADD    = ('a', 'add')
+COMMAND_SUDO_DEL    = ('d', 'del', 'rm')
+# all commands, subcommands and other regex in a main dict
+COMMAND_NAMES = {
+    'quit'    : ('q', 'quit', ':q', 'exit'),
+    'sudo'    : ('sudo', 'sudoers', 'sd'),
+    'plugins' : ('plugins', 'plugin', 'pg', 'pl', 'plg'),
+    'irc'     : ('irc', 'lastwords', 'words', 'last', 'lw', 'w', 'wl'),
+    'say'     : ('say',),
+    'subsudo' : COMMAND_SUDO_ADD + COMMAND_SUDO_DEL,
+    'subpgarg': COMMAND_PLUGINS_ADD + COMMAND_PLUGINS_DEL,
+    'subpgnoa': COMMAND_PLUGINS_PRT + COMMAND_PLUGINS_LS,
+    'args'    : ('.*',),
+}
+# printings values
 PRINTINGS_PLUGINS_MAX_WIDTH = 20
+DEFAULT_INTRO  = 'Welcome to the munin shell. Type help or ? to list commands.\n'
+DEFAULT_PROMPT = '?>'
 
+
+# COMMANDS
+def commands_grammar():
+    """Return a grammar for COMMAND_NAMES values."""
+    def cmd2reg(cmd, subcmd=None, args=None):
+        """layout automatization"""
+        return (
+            '(\s*  (?P<cmd>(' + '|'.join(COMMAND_NAMES[cmd]) + '))'
+            + ('' if subcmd is None
+               else ('\s+  (?P<subcmd>('+'|'.join(COMMAND_NAMES[subcmd]) + '))   \s*  '))
+            + ('' if args   is None
+               else ('\s+  (?P<args>('  +'|'.join(COMMAND_NAMES[args  ]) + '))   \s*  '))
+            + ') |\n'
+        )
+    # get grammar, log it and return it
+    grammar = (
+          cmd2reg('sudo'   , 'subsudo' , 'args')
+        + cmd2reg('quit'   , None      , None  )
+        + cmd2reg('plugins', 'subpgnoa', None  )
+        + cmd2reg('plugins', 'subpgarg', 'args')
+        + cmd2reg('irc'    , None      , 'args')
+        + cmd2reg('say'    , None      , 'args')
+    )
+    LOGGER.debug('GRAMMAR:\n' + grammar)
+    return pt_compile(grammar)
 
 
 #########################
@@ -43,21 +85,14 @@ PRINTINGS_PLUGINS_MAX_WIDTH = 20
 class Control():
     """
     Control a Bot, as defined in bot.py file.
-    Allow user to type its commands and use Control instance 
+    Allow user to type its commands and use Control instance
     as an IRC client.
     """
 
 
 # CONSTRUCTOR #################################################################
-    def __init__(self, bot):
+    def __init__(self, bot, prompt=DEFAULT_PROMPT, intro=DEFAULT_INTRO):
         self.bot, self.finished = bot, False
-        self.commands = {
-            RGX_SUDOERS_ADD : self.__bot_add_sudoer,
-            RGX_DISCONNECT  : self.__bot_disconnect,
-            RGX_SPEAK       : self.__bot_speak,
-            RGX_PLUGINS     : self.__plugins,
-            RGX_LAST_WORDS  : self.__last_words,
-        }
 
         # launch bot as thread
         self.bot_thread = threading.Thread(target=self.bot.start)
@@ -75,19 +110,31 @@ class Control():
 
         # main loop control
         LOGGER.info('Connected !')
-        try:
-            print("?>", end='')
-            cmd = input('')
-            while not self.finished:
-                self.finished = not self.bot.is_connected()
-                self.do_command(cmd)
-                if not self.finished: 
-                    print("?>", end='')
-                    cmd = input('')
-        except KeyboardInterrupt:
-            self.bot.disconnect()
-        except EOFError:
-            self.bot.disconnect()
+        print(intro, end='')
+        grammar = commands_grammar()
+        while True:
+            text  = get_input(prompt)
+            match = grammar.match(text)
+            if match is not None:
+                values = match.variables()
+                cmd    = values.get('cmd')
+                subcmd = values.get('subcmd')
+                args   = values.get('args')
+                LOGGER.debug('LINE:' + str(cmd) + str(subcmd) + str(args))
+                if cmd in COMMAND_NAMES['sudo']:
+                    self.__sudo(subcmd, args)
+                elif cmd in COMMAND_NAMES['plugins']:
+                    self.__plugins(subcmd, args)
+                elif cmd in COMMAND_NAMES['quit']:
+                    self.__disconnect()
+                elif cmd in COMMAND_NAMES['say']:
+                    self.__say(args)
+                elif cmd in COMMAND_NAMES['irc']:
+                    self.__last_words(args)
+                # elif cmd in ('', ''):
+                    # self.
+            else:
+                print('not a valid command')
 
         LOGGER.info('Disconnected !')
         # finalize all treatments
@@ -95,39 +142,30 @@ class Control():
 
 
 # PUBLIC METHODS ##############################################################
-    def do_command(self, msg):
-        """Operate given message as command"""
-        LOGGER.info('CMD:' + str(msg))
-        for rgx, cmd in self.commands.items():
-            if rgx.match(msg):
-                LOGGER.info('Internal command:' + str(cmd))
-                cmd(rgx.findall(msg))
-
-
 # PRIVATE METHODS #############################################################
-    def __bot_add_sudoer(self, regex_result):
+    def __sudo(self, subcmd, arg):
         """add asked sudoer to bot sudoers list"""
-        LOGGER.debug(regex_result)
+        if subcmd in COMMAND_SUDO_ADD:
+            print('SUDOERS: adding', arg, 'is necessary, but actually not performed')
+        else:
+            print('SUDOERS: removing', arg, 'is necessary, but actually not performed')
+        LOGGER.debug(arg)
         LOGGER.debug('not implemented !')
-        #self.bot.add_sudoer(regex_result[0][0])
+        print('OK !')
+        #self.bot.add_sudoer(arg)
 
-
-    def __bot_disconnect(self, regex_result):
+    def __disconnect(self):
         """disconnect and quit all"""
-        self.bot.disconnect()
         self.finished = True
+        self.bot.disconnect()
 
-
-    def __bot_speak(self, regex_result):
+    def __say(self, regex_result):
         """print message in canal"""
-        self.bot.send_message(regex_result[0])
-        LOGGER.debug('Said:' + str(regex_result[0]))
+        self.bot.send_message(regex_result)
+        LOGGER.debug('Said:' + str(regex_result))
 
-
-    def __plugins(self, regex_result):
+    def __plugins(self, subcmd, values):
         """management of plugins"""
-        command = regex_result[0][1].split(' ')
-        command, values = command[0], command[1:]
         error_code = {
             'name'  : 'need a valid plugin name',
             'id'    : 'need a valid plugin index',
@@ -135,7 +173,8 @@ class Control():
         error = None
 
         # listing
-        if command in ('list', 'l', 'ls'):
+        if subcmd in COMMAND_PLUGINS_LS:
+            assert(values is None)
             # each plugin will be shown with a [ACTIVATED] flag
             #  if already present of munin
             plugins = ((
@@ -151,11 +190,13 @@ class Control():
                       )
             print('\n'.join(plugins))
         # printing
-        if command in ('print', 'p', 'pr'):
+        if subcmd in COMMAND_PLUGINS_PRT:
+            assert(values is None)
             for fn in (str(f) for f in self.bot.plugins):
                 print(str(fn))
         # activation
-        elif command in ('activate', 'a', 'ac'):
+        elif subcmd in COMMAND_PLUGINS_ADD:
+            assert(values is not None)
             if len(values) > 0:
                 for name in values:
                     clss = config.import_plugin(name)
@@ -164,7 +205,8 @@ class Control():
             else:
                 error = 'name'
         # deactivation
-        elif command in ('deactivate', 'd', 'dc'):
+        elif subcmd in COMMAND_PLUGINS_DEL:
+            assert(values is not None)
             if len(values) > 0:
                 try:
                     for idx in (int(_) for _ in values):
@@ -179,9 +221,13 @@ class Control():
             print('ERROR:', error_code[error])
 
 
-    def __last_words(self, regex_result):
-        """Show last words of IRC"""
-        raise NotImplemented
+    def __last_words(self, args):
+        """Show last words on channel"""
+        args = int(args)
+        if args > 0:
+            raise NotImplementedError
+        else:
+            print('ERROR:', args, 'is not a valid number of message to display')
 
 
 # PREDICATS ###################################################################
