@@ -4,7 +4,4 @@ munin/configuration.py
 __pycache__/
 .*.swp
 .*.swo
-lib/
-include/
-bin/
-lib64
+venv/
