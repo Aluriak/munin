@@ -39,16 +39,16 @@ class Plugin():
 
 
 # PUBLIC METHODS ##############################################################
-    def accept_message(self, message, sudo=False, author=None):
+    def accept_message(self, message, sudo=False):
         """message is the complete message received from IRC
         This method return None if Plugin don't need to
          react to the message.
         Else, returned value will be received by do_command method.
         """
-        return self.regex().fullmatch(message)
+        return self.regex().fullmatch(message.message)
 
-    def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
-        """Execute command for bot, according to regex matchs, sudo mode, and author
+    def do_command(self, bot, message, matched_groups=None, sudo=False):
+        """Execute command for bot, according to regex matchs, sudo mode
 
         Return a string that will be sended by the bot. Not that string
         will be cut in multiple messages in place of \n character.
@@ -87,5 +87,11 @@ class Plugin():
         """Return short documentation about plugin and its command, usability, interests,…"""
         raise NotImplementedError
 
+    @property
+    def only_on_explicit_dest(self):
+        """True if message must be processed only if the bot is the recipient"""
+        return True
 
 
+    def __str__(self):
+        return (str(self.id) + ': ' + self.__class__.__name__).ljust(PRINTINGS_PLUGINS_MAX_WIDTH)

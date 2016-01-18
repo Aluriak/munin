@@ -16,7 +16,7 @@ class TodoList(Plugin):
     """
     Advanced Plugin application.
     """
-    REGEX     = re.compile(r" *to?do? (.+)")
+    REGEX     = re.compile(r"\s*to?do? (.+)")
     FEATURES  = {} # dict of regex:method, initialized in __init__
     SAVE_FILE_PREFIX  = 'data/'
     SAVE_FILE_SUFFIX  = '.tdl'
@@ -44,7 +44,7 @@ class TodoList(Plugin):
 
 
 # PUBLIC METHODS ##############################################################
-    def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
+    def do_command(self, bot, message, matched_groups=None, sudo=False):
         """Execute command for bot (unused), according to regex matchs (used) and sudo mode (unused)"""
         if not sudo: return '' # sudo is needed
         results = ''

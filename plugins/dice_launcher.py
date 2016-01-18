@@ -43,7 +43,7 @@ class DiceLauncher(Plugin):
 
 
 # PUBLIC METHODS ##############################################################
-    def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
+    def do_command(self, bot, message, matched_groups=None, sudo=False):
         """Execute command for bot (unused), according to regex matchs (used) and sudo mode (unused)"""
         results = ''
         total   = 0

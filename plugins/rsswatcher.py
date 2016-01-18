@@ -85,7 +85,7 @@ class RssWatcher(Plugin):
 
 
 # PUBLIC METHODS ##############################################################
-    def do_command(self, bot, message, matched_groups, sudo=False, author=None):
+    def do_command(self, bot, message, matched_groups, sudo=False):
         """Execute command for bot (unused), according 
         to regex matchs (used) and sudo mode (used)"""
         return self.__add_rss_feed(matched_groups[0]) if sudo else ''
