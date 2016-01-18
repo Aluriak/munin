@@ -22,17 +22,10 @@ from munin.plugin     import Plugin
 from munin.info       import PKG_NAME
 
 
-
-#########################
-# PRE-DECLARATIONS      #
-#########################
 PKG_NAME        = 'munin'
 DIR_PLUGINS     = 'plugins'
 
 
-#########################
-# LOGGING ACCESS        #
-#########################
 def logger(name=''):
     """Return logger of munin
 
@@ -47,12 +40,6 @@ def logger(name=''):
         return logging.getLogger(logger_name)
 
 
-
-
-
-#########################
-# IMPORT USER CLASSES   #
-#########################
 def plugin_class_check(cls):
     """Return True iff given cls is a valid plugin class"""
     return (

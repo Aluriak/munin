@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-#########################
-#       CONTROL         #
-#########################
 """
 Define the controller of the Bot itself.
 
@@ -12,21 +9,15 @@ The controller provide a full command line interface for administration:
 """
 
 
-#########################
-# IMPORTS               #
-#########################
 import threading
 import cmd
 import re
-import munin.config as config
+from munin import config
 # integrated command line
 from prompt_toolkit.shortcuts import get_input
 from prompt_toolkit.contrib.regular_languages.compiler import compile as pt_compile
 
 
-#########################
-# PRE-DECLARATIONS      #
-#########################
 LOGGER = config.logger()
 # list of reusable subcommands names
 COMMAND_PLUGINS_ADD = ('add', 'a', 'activate')

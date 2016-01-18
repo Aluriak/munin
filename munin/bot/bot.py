@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-#########################
-#       BOT             #
-#########################
 """
 The IRC Bot itself.
 
@@ -11,9 +7,6 @@ it provide lots of tools and automatize many behaviors.
 Can be controlled by Control instances.
 """
 
-#########################
-# IMPORTS               #
-#########################
 import irc.bot
 import irc.strings
 import irc.client
@@ -21,7 +14,8 @@ import re
 import time
 import threading
 
-import munin.config
+from munin import config
+from munin import ircmessage
 
 try:
     from munin.configuration import SERVER, PORT, CHANNEL, NICKNAME, REALNAME
@@ -78,7 +72,6 @@ class Bot(irc.bot.SingleServerIRCBot):
         self.check_func_thread.start()
 
 
-# PUBLIC METHODS ##############################################################
     def send_message(self, msg, dest=None, private=False):
         """"""
         if private is True: assert(private is True and dest is not None)
@@ -162,7 +155,6 @@ class Bot(irc.bot.SingleServerIRCBot):
         self.die()
 
 
-# IRC METHODS    ##############################################################
     def on_nicknameinuse(self, c, e):
         """If nickname already used, add _ at the end and go on"""
         self.nickname = self.nickname + '_'
@@ -201,29 +193,11 @@ class Bot(irc.bot.SingleServerIRCBot):
 
 
 
-
-
-# PRIVATE METHODS #############################################################
-# PREDICATS ###################################################################
     def is_connected(self):
         return self.connection.is_connected()
 
-
-# ACCESSORS ###################################################################
-# CONVERSION ##################################################################
-# OPERATORS ###################################################################
     def __contains__(self, o):
-        """Return True iff o is a Plugin subclass that have 
+        """Return True iff o is a Plugin subclass that have
         an instance in currently runned plugins.
         """
         return any(o is p.__class__ for p in self.plugins)
-
-
-
-
-#########################
-# FUNCTIONS             #
-#########################
-
-
-

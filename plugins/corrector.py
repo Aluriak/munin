@@ -11,17 +11,6 @@ from munin.plugin import Plugin
 import re
 
 
-
-
-#########################
-# PRE-DECLARATIONS      #
-#########################
-
-
-
-#########################
-# CLASS                 #
-#########################
 class Corrector(Plugin):
     """
     Simple Plugin application.
@@ -34,12 +23,9 @@ class Corrector(Plugin):
     REGEX     = re.compile(r"(.*)")
     REGEX_RGX = re.compile(r"s/([^/]+)\/([^/]+)/?.*")
 
-
-# CONSTRUCTOR #################################################################
     def __init__(self):
         super().__init__()
-        self.last_words = {} # author:last message
-
+        self.last_words = {} # author: last message
 
 # PUBLIC METHODS ##############################################################
     def do_command(self, bot, message, matched_groups=None, sudo=False, author=None):
@@ -49,7 +35,7 @@ class Corrector(Plugin):
         # if its a correction
         regres = Corrector.REGEX_RGX.fullmatch(matched_groups[0])
         if regres is not None:
-            # author need a correction 
+            # author need a correction
             regres = regres.groups()
             if author in self.last_words:
                 try:
@@ -68,25 +54,7 @@ class Corrector(Plugin):
             self.last_words[author] = matched_groups[0]
         return results
 
-
-
-# PRIVATE METHODS #############################################################
-# PREDICATS ###################################################################
-# ACCESSORS ###################################################################
     @property
     def help(self):
         return """CORRECTOR: apply regex as s/// format to your last sentence. Useless but fun."""
-
-
-# CONVERSION ##################################################################
-# OPERATORS ###################################################################
-
-
-
-
-#########################
-# FUNCTIONS             #
-#########################
-
-
 

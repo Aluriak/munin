@@ -14,17 +14,9 @@ Plugins system allow Munin IRC Bot to be fully extendable.
 import re
 
 
+PRINTINGS_PLUGINS_MAX_WIDTH = 20
 
 
-#########################
-# PRE-DECLARATIONS      #
-#########################
-
-
-
-#########################
-# PLUGIN BASE CLASS     #
-#########################
 class Plugin():
     """
     Body of a Plugin implementation.
@@ -76,13 +68,12 @@ class Plugin():
 # PREDICATS ###################################################################
     def want_speak(self):
         """Return True iff self have something to say
-        
+
         If a specialization don't have to tell something without order of anothers
         IRC users, this method don't need an overriding."""
         return False
 
 
-# ACCESSORS ###################################################################
     @classmethod
     def regex(cls):
         """Return regex used for match and receive things about message
@@ -95,21 +86,6 @@ class Plugin():
     def help(self):
         """Return short documentation about plugin and its command, usability, interests,…"""
         raise NotImplementedError
-
-
-# CONVERSION ##################################################################
-    def __str__(self):
-        return str(self.id) + ': ' + self.__class__.__name__
-
-
-# OPERATORS ###################################################################
-
-
-
-
-#########################
-# FUNCTIONS             #
-#########################
 
 
 

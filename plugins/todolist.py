@@ -12,16 +12,6 @@ import pickle
 import re
 
 
-
-#########################
-# PRE-DECLARATIONS      #
-#########################
-
-
-
-#########################
-# TODOLIST              #
-#########################
 class TodoList(Plugin):
     """
     Advanced Plugin application.
@@ -33,7 +23,6 @@ class TodoList(Plugin):
     SAVE_FILE_DEFAULT = 'default_todo_list'
 
 
-# CONSTRUCTOR #################################################################
     def __init__(self, savefile=SAVE_FILE_DEFAULT):
         super().__init__()
         self.savefile = savefile
@@ -60,12 +49,10 @@ class TodoList(Plugin):
         if not sudo: return '' # sudo is needed
         results = ''
         command = matched_groups[0]
-
         for regex, feature in self.FEATURES.items():
             regres = regex.fullmatch(command)
-            if regres is not None: # match !
+            if regres is not None:  # match !
                 results += feature(self, regres.groups()) or ''
-
         return results
 
     def todolist_add(self, matched_groups):
