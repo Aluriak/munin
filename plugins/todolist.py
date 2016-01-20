@@ -68,8 +68,8 @@ class TodoList(Plugin):
     def todolist_print(self, matched_groups):
         """return a print of todo list"""
         if len(self.todolist) == 0: return 'no item in current todolist'
-        return '\n'.join(['\t' + str(i) + ': ' + item[0] 
-                          + (' \t[CHECK]' if item[1] else '') 
+        return '\n'.join(['\t' + str(i) + ': ' + item[0]
+                          + (' \t[CHECK]' if item[1] else '')
                           for i, item in enumerate(self.todolist)
                          ])
 
@@ -100,7 +100,7 @@ class TodoList(Plugin):
         """Load todolist from filename or self.savefile if possible. Erase self.todolist."""
         filename = filename if filename is not None else self.savefile
         try:
-            with open(TodoList.SAVE_FILE_PREFIX + filename + TodoList.SAVE_FILE_SUFFIX, 'rb') as f:
+            with open(self.filename(filename), 'rb') as f:
                 self.todolist = pickle.load(f)
         except:
             filename = None
@@ -108,17 +108,19 @@ class TodoList(Plugin):
 
     def __save_todolist(self, filename=None):
         """Save todolist in filename or self.savefile if possible. Erase existing data in this file."""
-        filename = filename if filename is not None else self.savefile
+        filename = filename if filename else self.savefile
         try:
-            with open(TodoList.SAVE_FILE_PREFIX + filename + TodoList.SAVE_FILE_SUFFIX, 'wb') as f:
+            with open(self.filename(filename), 'wb') as f:
                 pickle.dump(self.todolist, f)
-        except:
+        except (IOError, PermissionError):
             filename = None
         return filename
 
+    def filename(self, basename, suffix=SAVE_FILE_SUFFIX):
+        """Return the filename of a file with given basename.
+        Prefix and suffix are by default given by Plugin class"""
+        return super().filename(filename, suffix=suffix)
 
-# PREDICATS ###################################################################
-# ACCESSORS ###################################################################
     @property
     def help(self):
         return """TODOLIST: wait for 'todo {add,print,check,clean,load,save}' command, for management of todo lists. Need sudo."""

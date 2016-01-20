@@ -133,8 +133,8 @@ class RssWatcher(Plugin):
         """Check all rss feeds for find something new"""
         with concurrent.futures.ProcessPoolExecutor() as executor:
             urls = self.urls.keys()
-            for url, last_item in zip(urls, 
-                                      executor.map(last_news, 
+            for url, last_item in zip(urls,
+                                      executor.map(last_news,
                                                    urls)
                                      ):
                 # if last knowed date is different from current one
@@ -153,7 +153,8 @@ class RssWatcher(Plugin):
 # ACCESSORS ###################################################################
     @property
     def help(self):
-        return """RSSWATCHER: notice when something is new on some RSS feed. sudo can add new feed with 'rss add <url>'."""
+        return ("RSSWATCHER: notice when something is new on some RSS feed."
+                "Sudoers can add new feed with 'rss add <url>'.")
 
 
 # CONVERSION ##################################################################
