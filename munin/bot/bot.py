@@ -7,19 +7,21 @@ it provide lots of tools and automatize many behaviors.
 Can be controlled by Control instances.
 """
 
+import re
+import time
+import random
+import threading
+
 import irc.bot
 import irc.strings
 import irc.client
-import re
-import time
-import threading
 
 from munin import config
 from munin import ircmessage
 
 try:
     from munin.configuration import SERVER, PORT, CHANNEL, NICKNAME, REALNAME
-    from munin.configuration import PASSWORD, CHECK_TIME, SUDOERS
+    from munin.configuration import PASSWORD, CHECK_TIME, SUDOERS, EXPRESSIVITY, EXPRESSIONS
 except ImportError:
     print(
         'No config file found !\n',
@@ -36,15 +38,19 @@ class Bot(irc.bot.SingleServerIRCBot):
     """IRC bot designed for allowing plugin improvements"""
 
 
-    def __init__(self, nickname=NICKNAME, realname=REALNAME, 
-                 server=SERVER, port=PORT, channel=CHANNEL, 
-                 check_time=CHECK_TIME, sudoers=SUDOERS):
+    def __init__(self, nickname=NICKNAME, realname=REALNAME,
+                 server=SERVER, port=PORT, channel=CHANNEL,
+                 check_time=CHECK_TIME, sudoers=SUDOERS,
+                 expressions=EXPRESSIONS, expressivity=EXPRESSIVITY):
         super().__init__([(server, port)], nickname, realname)
-        self.plugins    = set()  # activated plugins
-        self.channel    = channel
-        self.nickname   = nickname
-        self.sudoers    = sudoers
-        self.check_time = check_time
+        self.plugins      = set()  # activated plugins
+        self.channel      = channel
+        self.nickname     = nickname
+        self.sudoers      = sudoers
+        self.check_time   = check_time
+        self.expressions  = tuple(expressions)
+        self.expressivity = float(expressivity)
+        assert 0. <= self.expressivity <= 1.
 
         # check Plugins, if some have something to say
         def wait(): time.sleep(self.check_time)
@@ -57,11 +63,13 @@ class Bot(irc.bot.SingleServerIRCBot):
         self.check_func_thread.start()
 
 
-    def send_message(self, msg, dest=None, private=False):
+    def send_message(self, msg, dest=None, private=False, expressionable=True):
         """"""
         if private is True: assert(private is True and dest is not None)
         assert(msg is not None)
         assert(msg is not '')
+        if random.random() < self.expressivity and not any(msg.endswith(c) for c in '!?…'):
+            msg = msg.rstrip('.  …') + ', ' + self.expression
         try:
             if private is True:
                 self.connection.privmsg(dest, msg)
@@ -171,3 +179,10 @@ class Bot(irc.bot.SingleServerIRCBot):
         an instance in currently runned plugins.
         """
         return any(o is p.__class__ for p in self.plugins)
+
+    @property
+    def expression(self):
+        try:
+            return random.choice(self.expressions)
+        except IndexError:
+            return ''
