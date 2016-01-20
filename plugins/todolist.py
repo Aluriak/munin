@@ -18,21 +18,20 @@ class TodoList(Plugin):
     """
     REGEX     = re.compile(r"\s*to?do? (.+)")
     FEATURES  = {} # dict of regex:method, initialized in __init__
-    SAVE_FILE_PREFIX  = 'data/'
     SAVE_FILE_SUFFIX  = '.tdl'
     SAVE_FILE_DEFAULT = 'default_todo_list'
 
 
-    def __init__(self, savefile=SAVE_FILE_DEFAULT):
-        super().__init__()
+    def __init__(self, bot, savefile=SAVE_FILE_DEFAULT):
+        super().__init__(bot)
         self.savefile = savefile
         self.todolist = [] # (str, bool) strings are things to do, bool is check predicat
         TodoList.FEATURES.update({ # useless, except in the first case of instanciation
             re.compile(r"a(?:dd)? +(.*)")               : TodoList.todolist_add,
             re.compile(r"c(?:heck)?((?:\s+\d+)+)")      : TodoList.todolist_check,
-            re.compile(r"p(?:rint)? *")                 : TodoList.todolist_print, 
-            re.compile(r"s(?:ave)? *((?:[a-zA-Z0-9_])+)?.*") : TodoList.todolist_save, 
-            re.compile(r"l(?:oad)? *((?:[a-zA-Z0-9_])+)?.*") : TodoList.todolist_load, 
+            re.compile(r"p(?:rint)? *")                 : TodoList.todolist_print,
+            re.compile(r"s(?:ave)? *((?:[a-zA-Z0-9_])+)?.*") : TodoList.todolist_save,
+            re.compile(r"l(?:oad)? *((?:[a-zA-Z0-9_])+)?.*") : TodoList.todolist_load,
             re.compile(r"clean|clear *")                : TodoList.todolist_clean,
         })
         # if possible, load the todolist from savefile
@@ -69,8 +68,8 @@ class TodoList(Plugin):
     def todolist_print(self, matched_groups):
         """return a print of todo list"""
         if len(self.todolist) == 0: return 'no item in current todolist'
-        return '\n'.join(['\t' + str(i) + ': ' + item[0] 
-                          + (' \t[CHECK]' if item[1] else '') 
+        return '\n'.join(['\t' + str(i) + ': ' + item[0]
+                          + (' \t[CHECK]' if item[1] else '')
                           for i, item in enumerate(self.todolist)
                          ])
 
@@ -101,7 +100,7 @@ class TodoList(Plugin):
         """Load todolist from filename or self.savefile if possible. Erase self.todolist."""
         filename = filename if filename is not None else self.savefile
         try:
-            with open(TodoList.SAVE_FILE_PREFIX + filename + TodoList.SAVE_FILE_SUFFIX, 'rb') as f:
+            with open(self.filename(filename), 'rb') as f:
                 self.todolist = pickle.load(f)
         except:
             filename = None
@@ -109,17 +108,19 @@ class TodoList(Plugin):
 
     def __save_todolist(self, filename=None):
         """Save todolist in filename or self.savefile if possible. Erase existing data in this file."""
-        filename = filename if filename is not None else self.savefile
+        filename = filename if filename else self.savefile
         try:
-            with open(TodoList.SAVE_FILE_PREFIX + filename + TodoList.SAVE_FILE_SUFFIX, 'wb') as f:
+            with open(self.filename(filename), 'wb') as f:
                 pickle.dump(self.todolist, f)
-        except:
+        except (IOError, PermissionError):
             filename = None
         return filename
 
+    def filename(self, basename, suffix=SAVE_FILE_SUFFIX):
+        """Return the filename of a file with given basename.
+        Prefix and suffix are by default given by Plugin class"""
+        return super().filename(filename, suffix=suffix)
 
-# PREDICATS ###################################################################
-# ACCESSORS ###################################################################
     @property
     def help(self):
         return """TODOLIST: wait for 'todo {add,print,check,clean,load,save}' command, for management of todo lists. Need sudo."""

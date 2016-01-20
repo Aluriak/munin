@@ -39,6 +39,7 @@ COMMAND_NAMES = {
     'subpgnoa': COMMAND_PLUGINS_PRT + COMMAND_PLUGINS_LS,
     'args'    : ('.*',),
     'help'    : ('help', 'h',),
+    'operate' : ('op', 'operate',),  # debug command
 }
 # printings values
 PRINTINGS_PLUGINS_MAX_WIDTH = 20
@@ -67,6 +68,8 @@ def commands_grammar():
         + cmd2reg('plugins', 'subpgarg', 'args')
         + cmd2reg('irc'    , None      , 'args')
         + cmd2reg('say'    , None      , 'args')
+        + cmd2reg('help'   , None      , None  )
+        + cmd2reg('operate', None      , None  )
     )
     LOGGER.debug('GRAMMAR:\n' + grammar)
     return pt_compile(grammar)
@@ -92,7 +95,7 @@ class Control():
         self.bot_thread.start()
 
         # Initial plugins
-        self.available_plugins = tuple(p() for p in config.import_plugins())
+        self.available_plugins = tuple(p(bot) for p in config.import_plugins())
 
         # Add whitelisted plugins automatically # TODO
         for plugin in self.available_plugins:
@@ -104,8 +107,12 @@ class Control():
         LOGGER.info('Connected !')
         print(intro, end='')
         grammar = commands_grammar()
-        while True:
-            text  = get_input(prompt)
+        while not self.finished:
+            try:
+                text  = get_input(prompt)
+            except EOFError:
+                self.__disconnect()
+                continue
             match = grammar.match(text)
             if match is not None:
                 values = match.variables()
@@ -123,8 +130,10 @@ class Control():
                     self.__say(args)
                 elif cmd in COMMAND_NAMES['irc']:
                     self.__last_words(args)
-                # elif cmd in ('', ''):
-                    # self.
+                elif cmd in COMMAND_NAMES['help']:
+                    self.__help()
+                elif cmd in COMMAND_NAMES['operate']:
+                    self.__operate()
             else:
                 print('not a valid command')
 
@@ -215,6 +224,19 @@ class Control():
             raise NotImplementedError
         else:
             print('ERROR:', args, 'is not a valid number of message to display')
+
+
+    def __help(self):
+        print('This is the help: «good luck»')  # TODO: do something useful
+
+
+    def __operate(self):
+        receiver = input('Send gold to: ')
+        for plugin in self.bot.plugins:
+            if 'GoldManager' in plugin.__class__.__name__:
+                plugin.give_gold(receiver)
+                print('Gold added to', receiver)
+                return
 
     def active(self, plugin):
         """True if given plugin is active, ie is referenced by bot"""

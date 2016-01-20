@@ -12,17 +12,11 @@ from random import randint
 import re
 
 
+MAX_DICE_SIZE   = 100
+MAX_DICE_NUMBER = 100
+MAX_SET_NUMBER  = 10
 
 
-#########################
-# PRE-DECLARATIONS      #
-#########################
-
-
-
-#########################
-# CLASS                 #
-#########################
 class DiceLauncher(Plugin):
     """
     Simple Plugin application.
@@ -38,8 +32,8 @@ class DiceLauncher(Plugin):
 
 
 # CONSTRUCTOR #################################################################
-    def __init__(self):
-        super().__init__()
+    def __init__(self, bot):
+        super().__init__(bot)
 
 
 # PUBLIC METHODS ##############################################################
@@ -49,14 +43,23 @@ class DiceLauncher(Plugin):
         total   = 0
         dice_set_count = 0
 
-        for dice_set in matched_groups[0].split(' '):
+        for set_number, dice_set in enumerate(matched_groups[0].split(' ')):
             n, s = dice_set.lower().split('d')
+            if int(s) > MAX_DICE_SIZE:
+                results += 'too big dice size\n'
+                continue
+            if int(n) > MAX_DICE_NUMBER:
+                results += 'too big number of dice\n'
+                continue
+            if set_number > MAX_SET_NUMBER:
+                results += 'too many sets\n'
+                break
             if '0' in (n, s): continue
             numbers  = [randint(1, int(s)) for _ in range(int(n))]
             total   += sum(numbers)
-            results += ('{' 
-                        + ', '.join((str(_) for _ in numbers)) 
-                        + '} \ttotal: ' + str(sum(numbers)) 
+            results += ('{'
+                        + ', '.join((str(_) for _ in numbers))
+                        + '} \ttotal: ' + str(sum(numbers))
                         + '\n'
                        )
             dice_set_count += 1

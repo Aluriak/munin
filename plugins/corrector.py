@@ -23,8 +23,8 @@ class Corrector(Plugin):
     REGEX     = re.compile(r"(.*)")
     REGEX_RGX = re.compile(r"s/([^/]+)\/([^/]+)/?.*")
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, bot):
+        super().__init__(bot)
         self.last_words = {} # author: last message
 
     def do_command(self, bot, message, matched_groups=None, sudo=False):
@@ -38,14 +38,18 @@ class Corrector(Plugin):
             # author need a correction
             regres = regres.groups()
             if author in self.last_words:
-                regex   = re.compile(regres[0])
-                replace = regres[1] if len(regres) > 1 else ''
-                self.last_words[author] = re.sub(regex, replace,
-                                                 self.last_words[author])
-                results = self.last_words[author]
-                results += ' \t«««« corrected ' + author + ' words'
+                try:
+                    regex   = re.compile(regres[0])
+                    replace = regres[1] if len(regres) > 1 else ''
+                    self.last_words[author] = re.sub(regex, replace,
+                                                     self.last_words[author])
+                    results = self.last_words[author]
+                    results += ' \t«««« corrected ' + author + ' words'
+                except re.sre_constants.error:
+                    # something go wrong with user's regex
+                    results += "from the dark side, you're REGEX comes.\n"
         else:  # author don't write a regex ; whatever it is, it's now its last words
-            self.last_words[author] = matched_groups[0]
+            self.last_words[author] = message.all
         return results
 
     @property

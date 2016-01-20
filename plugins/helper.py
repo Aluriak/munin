@@ -31,8 +31,8 @@ class Helper(Plugin):
 
 
 # CONSTRUCTOR #################################################################
-    def __init__(self):
-        super().__init__()
+    def __init__(self, bot):
+        super().__init__(bot)
 
 
 # PUBLIC METHODS ##############################################################
