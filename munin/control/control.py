@@ -92,7 +92,7 @@ class Control():
         self.bot_thread.start()
 
         # Initial plugins
-        self.available_plugins = tuple(p() for p in config.import_plugins())
+        self.available_plugins = tuple(p(bot) for p in config.import_plugins())
 
         # Add whitelisted plugins automatically # TODO
         for plugin in self.available_plugins:

@@ -41,9 +41,9 @@ class RssWatcher(Plugin):
 
 
 # CONSTRUCTOR #################################################################
-    def __init__(self, urls=None, savefile=SAVE_FILE_DEFAULT, temporization=10):
+    def __init__(self, bot, urls=None, savefile=SAVE_FILE_DEFAULT, temporization=10):
         """Optionnaly wait for a list of rss feed url and a filename."""
-        super().__init__()
+        super().__init__(bot)
         self.news = []
         self.savefile = (RssWatcher.SAVE_FILE_PREFIX 
                          + savefile 

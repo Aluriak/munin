@@ -18,21 +18,20 @@ class TodoList(Plugin):
     """
     REGEX     = re.compile(r"\s*to?do? (.+)")
     FEATURES  = {} # dict of regex:method, initialized in __init__
-    SAVE_FILE_PREFIX  = 'data/'
     SAVE_FILE_SUFFIX  = '.tdl'
     SAVE_FILE_DEFAULT = 'default_todo_list'
 
 
-    def __init__(self, savefile=SAVE_FILE_DEFAULT):
-        super().__init__()
+    def __init__(self, bot, savefile=SAVE_FILE_DEFAULT):
+        super().__init__(bot)
         self.savefile = savefile
         self.todolist = [] # (str, bool) strings are things to do, bool is check predicat
         TodoList.FEATURES.update({ # useless, except in the first case of instanciation
             re.compile(r"a(?:dd)? +(.*)")               : TodoList.todolist_add,
             re.compile(r"c(?:heck)?((?:\s+\d+)+)")      : TodoList.todolist_check,
-            re.compile(r"p(?:rint)? *")                 : TodoList.todolist_print, 
-            re.compile(r"s(?:ave)? *((?:[a-zA-Z0-9_])+)?.*") : TodoList.todolist_save, 
-            re.compile(r"l(?:oad)? *((?:[a-zA-Z0-9_])+)?.*") : TodoList.todolist_load, 
+            re.compile(r"p(?:rint)? *")                 : TodoList.todolist_print,
+            re.compile(r"s(?:ave)? *((?:[a-zA-Z0-9_])+)?.*") : TodoList.todolist_save,
+            re.compile(r"l(?:oad)? *((?:[a-zA-Z0-9_])+)?.*") : TodoList.todolist_load,
             re.compile(r"clean|clear *")                : TodoList.todolist_clean,
         })
         # if possible, load the todolist from savefile

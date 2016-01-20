@@ -12,17 +12,11 @@ from random import randint
 import re
 
 
+MAX_DICE_SIZE   = 100
+MAX_DICE_NUMBER = 100
+MAX_SET_NUMBER  = 10
 
 
-#########################
-# PRE-DECLARATIONS      #
-#########################
-
-
-
-#########################
-# CLASS                 #
-#########################
 class DiceLauncher(Plugin):
     """
     Simple Plugin application.
@@ -38,8 +32,8 @@ class DiceLauncher(Plugin):
 
 
 # CONSTRUCTOR #################################################################
-    def __init__(self):
-        super().__init__()
+    def __init__(self, bot):
+        super().__init__(bot)
 
 
 # PUBLIC METHODS ##############################################################

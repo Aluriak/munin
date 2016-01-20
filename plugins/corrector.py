@@ -23,8 +23,8 @@ class Corrector(Plugin):
     REGEX     = re.compile(r"(.*)")
     REGEX_RGX = re.compile(r"s/([^/]+)\/([^/]+)/?.*")
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, bot):
+        super().__init__(bot)
         self.last_words = {} # author: last message
 
     def do_command(self, bot, message, matched_groups=None, sudo=False):
