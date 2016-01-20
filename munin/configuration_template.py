@@ -6,6 +6,5 @@ REALNAME     = 'gérard'
 CHECK_TIME   = 5
 PASSWORD     = ''
 SUDOERS      = {'master', 'gérard'}
-SUDOERS      = {'elucator', 'aluriak'}
 EXPRESSIONS  = {'my friend', 'little man'}
 EXPRESSIVITY = 0.1
