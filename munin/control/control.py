@@ -107,8 +107,12 @@ class Control():
         LOGGER.info('Connected !')
         print(intro, end='')
         grammar = commands_grammar()
-        while True:
-            text  = get_input(prompt)
+        while not self.finished:
+            try:
+                text  = get_input(prompt)
+            except EOFError:
+                self.__disconnect()
+                continue
             match = grammar.match(text)
             if match is not None:
                 values = match.variables()
