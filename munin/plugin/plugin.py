@@ -17,7 +17,7 @@ import re
 PRINTINGS_PLUGINS_MAX_WIDTH = 20
 
 
-class Plugin():
+class Plugin:
     """
     Body of a Plugin implementation.
     Inherit from this class is not useless, but not necessary:
@@ -30,15 +30,16 @@ class Plugin():
     # plugin must be called, and with whitch parameters.
     REGEX   = re.compile(r"(.*)")
     NEXT_ID = 1
+    SAVE_FILE_PREFIX  = 'data/'
+    SAVE_FILE_SUFFIX  = '.plugin'
 
 
-# CONSTRUCTOR #################################################################
-    def __init__(self):
+    def __init__(self, bot):
         self.id = Plugin.NEXT_ID
         Plugin.NEXT_ID += 1
+        self.bot = bot
 
 
-# PUBLIC METHODS ##############################################################
     def accept_message(self, message, sudo=False):
         """message is the complete message received from IRC
         This method return None if Plugin don't need to
@@ -63,9 +64,12 @@ class Plugin():
         raise NotImplementedError
 
 
+    def filename(self, basename, prefix=SAVE_FILE_PREFIX,
+                 suffix=SAVE_FILE_SUFFIX):
+        """Return the filename of a file with given basename.
+        Prefix and suffix are by default given by Plugin class"""
+        return prefix + basename + suffix
 
-# PRIVATE METHODS #############################################################
-# PREDICATS ###################################################################
     def want_speak(self):
         """Return True iff self have something to say
 
