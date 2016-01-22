@@ -10,10 +10,10 @@ from munin.plugin import Plugin
 
 class VoteCounter(Plugin):
     """
-    Simple Plugin application.
-    Repeat last sentence of user that correct it by using a regex.
+    Poll management, for counting votes of a predefined set of answers.
     example:
         lucas| bot: poll "Who is the best" "me;lucas;no one" "lucas;michel;gerard"
+
     """
     REGEX     = re.compile(r"(.*)")
     REGEX_POLL = re.compile(r"""\s*poll\s*"([^"]+)"\s*"([^"]+)"\s*"([^"]+)"\s*""")
