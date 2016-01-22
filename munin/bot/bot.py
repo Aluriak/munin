@@ -68,7 +68,7 @@ class Bot(irc.bot.SingleServerIRCBot):
         if private is True: assert(private is True and dest is not None)
         assert(msg is not None)
         assert(msg is not '')
-        if random.random() < self.expressivity and not any(msg.endswith(c) for c in '!?…'):
+        if random.random() < self.expressivity and not any(msg.endswith(c) for c in ':!?…'):
             msg = msg.rstrip('.  …') + ', ' + self.expression
         try:
             if private is True:
