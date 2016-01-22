@@ -39,7 +39,11 @@ Maybe a day:
 - [ ] rewrite core in ada;
 
 ## Start an instance of munin
-First, you need to creat a munin/configuration.py file:
+First, install dependencie:
+       
+       pip install -r requirements.txt
+
+Second, you need to creat a munin/configuration.py file:
 
         cp munin/configuration_template.py munin/configuration.py
 
@@ -47,6 +51,9 @@ Edit it for have your bot as expected:
 
         vim munin/configuration.py
 
+Run munin:
+	
+	make
 
 ## Changelog
 - 0.3.0:
