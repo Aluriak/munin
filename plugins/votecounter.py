@@ -37,7 +37,7 @@ class VoteCounter(Plugin):
         regres_ends = VoteCounter.REGEX_ENDS.fullmatch(matched_groups[0])
         regres_resm = VoteCounter.REGEX_RESM.fullmatch(matched_groups[0])
         regres_prnt = VoteCounter.REGEX_PRNT.fullmatch(matched_groups[0])
-        print('POLL:', regres_poll, regres_vote, regres_ends, regres_resm, regres_prnt)
+        # print('POLL:', regres_poll, regres_vote, regres_ends, regres_resm, regres_prnt)
         if regres_poll:
             groups = regres_poll.groups()
             self.poll    = str(groups[0])
