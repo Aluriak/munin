@@ -137,12 +137,14 @@ class Control():
                     self.__help()
                 elif cmd in COMMAND_NAMES['operate']:
                     self.__operate()
+                elif cmd in COMMAND_NAMES['debug']:
+                    self.__debug()
             else:
                 print('not a valid command')
 
-        LOGGER.info('Disconnected !')
         # finalize all treatments
-        self.bot_thread.join()
+        LOGGER.info('Disconnected !')
+        # self.bot_thread.join()  # warning: wait forever
 
 
 # PUBLIC METHODS ##############################################################
