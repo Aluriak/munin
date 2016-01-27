@@ -25,7 +25,7 @@ class TodoList(Plugin):
     def __init__(self, bot, savefile=SAVE_FILE_DEFAULT):
         super().__init__(bot)
         self.savefile = savefile
-        self.todolist = [] # (str, bool) strings are things to do, bool is check predicat
+        self.todolist = self.default_persistant_data()
         TodoList.FEATURES.update({ # useless, except in the first case of instanciation
             re.compile(r"a(?:dd)? +(.*)")               : TodoList.todolist_add,
             re.compile(r"c(?:heck)?((?:\s+\d+)+)")      : TodoList.todolist_check,
@@ -116,25 +116,22 @@ class TodoList(Plugin):
             filename = None
         return filename
 
-    def filename(self, basename, suffix=SAVE_FILE_SUFFIX):
-        """Return the filename of a file with given basename.
-        Prefix and suffix are by default given by Plugin class"""
-        return super().filename(filename, suffix=suffix)
-
     @property
     def help(self):
         return """TODOLIST: wait for 'todo {add,print,check,clean,load,save}' command, for management of todo lists. Need sudo."""
 
+    @property
+    def debug_data(self):
+        return self.todolist
 
-# CONVERSION ##################################################################
-# OPERATORS ###################################################################
+    @property
+    def persistent_data(self):
+        return self.todolist
 
+    @persistent_data.setter
+    def persistent_data(self, values):
+        self.todolist = values
 
-
-
-#########################
-# FUNCTIONS             #
-#########################
-
-
-
+    def default_persistant_data(self):
+        """Return the default persistent data"""
+        return [] # (str, bool) strings are things to do, bool is check predicat
