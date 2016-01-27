@@ -45,18 +45,13 @@ class RssWatcher(Plugin):
         """Optionnaly wait for a list of rss feed url and a filename."""
         super().__init__(bot)
         self.news = []
-        self.savefile = (RssWatcher.SAVE_FILE_PREFIX 
-                         + savefile 
+        self.savefile = (RssWatcher.SAVE_FILE_PREFIX
+                         + savefile
                          + RssWatcher.SAVE_FILE_SUFFIX
                         )
-        self.temporization = temporization 
+        self.temporization = temporization
         self.terminated = False
-        if urls is None:    
-            self.load_rss_feeds()
-        else:
-            [self.__add_rss_feed(url) 
-             for url in ([] if urls is None else urls)
-            ] 
+        self.urls = self.default_persistant_data()
         # start check RSS feeds
         def checker_daemon(rsswatcher_instance):
             """Check all RSS feed for news regularly"""
@@ -64,27 +59,19 @@ class RssWatcher(Plugin):
             while not rsswatcher_instance.terminated:
                 t += 1
                 if t >= rsswatcher_instance.temporization:
-                    try:
-                        rsswatcher_instance.__check_rss_feeds()
-                    except UnicodeDecodeError:
-                        print('ERROR: UnicodeDecodeError in RSSWATCHER check_rss_feeds()')
+                    rsswatcher_instance.__check_rss_feeds()
                     t = 0
-                else: 
+                else:
                     time.sleep(1)
         self.check_rss_thread = threading.Thread(target=checker_daemon, args=[self])
         self.check_rss_thread.start()
-        # DEBUG
-        #print(self.__add_rss_feed('https://github.com/aluriak/EvolAcc/commits/master.atom'))
-        #self.__check_rss_feeds()
 
     def __del__(self):
         """Save rss_feed in self.savefile file"""
         self.terminated = True
         self.check_rss_thread.join()
-        self.save_rss_feeds()
 
 
-# PUBLIC METHODS ##############################################################
     def do_command(self, bot, message, matched_groups, sudo=False):
         """Execute command for bot (unused), according 
         to regex matchs (used) and sudo mode (used)"""
@@ -97,28 +84,9 @@ class RssWatcher(Plugin):
             for item in self.news
         ))
         self.news = []
-        self.save_rss_feeds() # update RSS feed save
         return text
 
-    def load_rss_feeds(self):
-        """Load RSS feeds from a pickle file"""
-        try:
-            with open(self.savefile, 'rb') as f:
-                self.urls = pickle.load(f)
-        except FileNotFoundError:
-            print("ERROR: RssWatcher can't find file " + self.savefile)
-            self.urls = {}
 
-    def save_rss_feeds(self):
-        """Save RSS feeds in a file in pickle"""
-        try:
-            with open(self.savefile, 'wb') as f:
-                pickle.dump(self.urls, f)
-        except FileNotFoundError:
-            print("ERROR: RssWatcher can't find file " + self.savefile)
-
-
-# PRIVATE METHODS #############################################################
     def __add_rss_feed(self, url):
         """Add given url in RSS feed internal list. No doublons possible."""
         last = last_news(url)
@@ -143,29 +111,32 @@ class RssWatcher(Plugin):
                     self.urls[url] = last_item.date
                     self.news.append(last_item)
 
-
-# PREDICATS ###################################################################
     def want_speak(self):
         """True iff at least one news to notice."""
         return len(self.news) > 0
 
-
-# ACCESSORS ###################################################################
     @property
     def help(self):
         return ("RSSWATCHER: notice when something is new on some RSS feed."
                 "Sudoers can add new feed with 'rss add <url>'.")
 
+    @property
+    def debug_data(self):
+        return self.urls
 
-# CONVERSION ##################################################################
-# OPERATORS ###################################################################
+    @property
+    def persistent_data(self):
+        return self.urls
+
+    @persistent_data.setter
+    def persistent_data(self, values):
+        self.urls = values
+
+    def default_persistant_data(self):
+        """Return the default persistent data"""
+        return {}
 
 
-
-
-#########################
-# FUNCTIONS             #
-#########################
 def last_news(url):
     """Parse given url, and return last entry, 
     or None if unable to access to feed."""
@@ -176,5 +147,3 @@ def last_news(url):
         ret = None
     finally:
         return ret
-
-
