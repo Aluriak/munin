@@ -19,17 +19,6 @@ import irc.client
 from munin import config
 from munin import ircmessage
 
-try:
-    from munin.configuration import SERVER, PORT, CHANNEL, NICKNAME, REALNAME
-    from munin.configuration import PASSWORD, CHECK_TIME, SUDOERS, EXPRESSIVITY, EXPRESSIONS
-except ImportError:
-    print(
-        'No config file found !\n',
-        'Please create your own like munin/configuration_template.py',
-        'named munin/configuration.py.'
-    )
-    exit(0)
-
 
 LOGGER = config.logger()
 
