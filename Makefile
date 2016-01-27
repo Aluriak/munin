@@ -1,4 +1,4 @@
-CHAN=--channel=\#big_rennes
+#CHAN=--channel=\#test_munin
 
 CONFIG_FILE=config.json
 OPTIONS=$(CHAN)
