@@ -1,5 +1,10 @@
+CHAN=--channel=\#big_rennes
+
+OPTIONS=$(CHAN)
+
+
 mnn:
-	python3 -m munin
+	python3 -m munin $(OPTIONS)
 
 tt:
 	pylint munin/__main__.py
