@@ -45,15 +45,16 @@ First, install dependencie:
 
 Second, you need to creat a munin/configuration.py file:
 
-        cp munin/configuration_template.py munin/configuration.py
+        cp config_template.json config.json
 
 Edit it for have your bot as expected:
 
-        vim munin/configuration.py
+        vim config.json
 
 Run munin:
-	
+
 	make
+
 
 ## Changelog
 - 0.3.0:
