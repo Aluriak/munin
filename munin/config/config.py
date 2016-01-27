@@ -33,6 +33,7 @@ class Config(Enum):
     Sudoers      = 'sudoers'
     Expressions  = 'expressions'
     Expressivity = 'expressivity'
+    DataDir      = 'data_dir'
 
     @staticmethod
     def keys():
@@ -51,6 +52,7 @@ DEFAULT_CONFIG = {
     Config.Sudoers.value      : {},
     Config.Expressions.value  : {},
     Config.Expressivity.value : 0.0,
+    Config.DataDir.value      : 'data/',
 }
 
 
