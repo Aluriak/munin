@@ -82,7 +82,7 @@ class GoldManager(Plugin):
                 results += author + " don't have enough gold !\n"
         elif reg_gm:  # someone want to get gold
             reason = reg_gm.groups()[0]
-            if self.accept(reason) and self.give_gold(author, reason=reason):
+            if self.accept(reason, author) and self.give_gold(author, reason=reason):
                 results += "You're so cute, " + self.bot.expression
                 results += " ; please get your gold :)"
             else:
@@ -96,7 +96,7 @@ class GoldManager(Plugin):
         elif reg_go:  # author wants to know how many gold have someone
             receiver = reg_go.groups()[0]
             if receiver in self.gold:
-                results += receiver + ' have ' + str(len(self.gold[receiver])) + ' gold.'
+                results += receiver + ' has ' + str(len(self.gold[receiver])) + ' gold.'
             else:
                 results += "I don't know " + receiver
         elif reg_rg and author in self.bot.sudoers:  # author wants to reset golds
@@ -154,9 +154,10 @@ class GoldManager(Plugin):
         # print('GOLD: gold table saved:', self.gold)
 
 
-    def accept(self, reason):
+    def accept(self, reason, author):
         """Return True if given reason is sufficient for get a gold"""
-        return True
+        return author in self.bot.sudoers
+
 
     def reset_gold(self):
         """Reset all golds. Note : all gold are loss"""
