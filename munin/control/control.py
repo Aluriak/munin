@@ -231,12 +231,32 @@ class Control():
 
 
     def __operate(self):
-        receiver = input('Send gold to: ')
-        for plugin in self.bot.plugins:
-            if 'GoldManager' in plugin.__class__.__name__:
-                plugin.give_gold(receiver)
+        command = int(input("""\t0: send gold to...\n\t1: take gold of...\t\t2: take n gold of...\n\t3:send n gold to many..."""))
+        gold_manager = next(plugin for plugin in self.bot.plugins
+                            if 'GoldManager' in plugin.__class__.__name__)
+        if command == 0:
+            receiver = input('Send gold to: ')
+            gold_manager.give_gold(receiver)
+            print('Gold added to', receiver)
+        elif command == 1:
+            donator = input('Take one gold of: ')
+            receiver = input('give it to: ')
+            gold_manager.give_gold(receiver, donator=donator)
+            print('Gold added to', receiver)
+        elif command == 2:
+            donator = input('Take gold of: ')
+            receiver = input('give it to: ')
+            nb_gold = int(input('nb_gold: '))
+            for _ in range(nb_gold):
+                gold_manager.give_gold(receiver, donator=donator)
                 print('Gold added to', receiver)
-                return
+        elif command == 3:
+            nb_gold = int(input('nb_gold per name: '))
+            receivers = input('give it to (comma sep): ').split(',')
+            for receiver in receivers:
+                for _ in range(nb_gold):
+                    gold_manager.give_gold(receiver)
+                    print('Gold added to', receiver)
 
     def active(self, plugin):
         """True if given plugin is active, ie is referenced by bot"""
