@@ -1,0 +1,12 @@
+{
+    "server"       : "irc.freenode.net",
+    "port"         : 6667,
+    "channel"      : "#munin_test_chan",
+    "nickname"     : "i_am_a_bot",
+    "realname"     : "gérard",
+    "password"     : "",
+    "check_time"   : 5,
+    "sudoers"      : ["master", "gérard"],
+    "expressions"  : ["my friend", "little man"],
+    "expressivity" : 0.1
+}

@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-#########################
-#       CONFIG          #
-#########################
 """
-Definitions of default configurations,
-mainly about logging and plugin importing.
+Definitions of importing primitives,
+
 """
 
 #########################
@@ -16,28 +12,11 @@ import logging
 import glob
 import os
 
-
-from logging.handlers import RotatingFileHandler
 from munin.plugin     import Plugin
 from munin.info       import PKG_NAME
 
 
-PKG_NAME        = 'munin'
 DIR_PLUGINS     = 'plugins'
-
-
-def logger(name=''):
-    """Return logger of munin
-
-    If name is provided, it will be registered like a submodule of munin.
-    Adapted for Plugins.
-    """
-    import munin.config.conflog as conflog
-    logger_name = conflog.LOGGER_NAME
-    if len(name) > 0:
-        return logging.getLogger(logger_name + '.' + name)
-    else:
-        return logging.getLogger(logger_name)
 
 
 def plugin_class_check(cls):
@@ -89,5 +68,3 @@ def list_plugins():
             for f in glob.glob(DIR_PLUGINS + '/*.py')
             if not f.startswith('_')
            )
-
-

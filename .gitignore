@@ -1,4 +1,4 @@
-munin/configuration.py
+config.json
 *.pyc
 *.log*
 __pycache__/
