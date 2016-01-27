@@ -101,6 +101,7 @@ class Control():
 
         # Add whitelisted plugins automatically # TODO
         for plugin in self.available_plugins:
+            plugin.load_persistent_data()
             self.bot.add_plugin(plugin)
             LOGGER.info('PLUGIN LOADED: ' + str(plugin))
         assert all(self.active(f) for f in self.available_plugins)
@@ -158,7 +159,9 @@ class Control():
         #self.bot.add_sudoer(arg)
 
     def __disconnect(self):
-        """disconnect and quit all"""
+        """save persistant data, and disconnect and quit all connections"""
+        for plugin in self.available_plugins:
+            plugin.save_persistent_data()
         self.finished = True
         self.bot.disconnect()
 
