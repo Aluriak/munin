@@ -42,8 +42,8 @@ class GoldManager(Plugin):
     def __init__(self, bot):
         super().__init__(bot)
         self.last_words = {'munin': "I'm a stegausorus !"} # author: last message
-        self.load_gold()
-        self.used_reasons = set()
+        self.gold = self.default_persistant_data()
+        # regexes management
         prefix = self.bot.nickname + ':?\s*'
         self.reg_givegold   = re.compile(prefix + GoldManager.REGEX_GG)
         self.reg_givealias  = re.compile(         GoldManager.REGEX_GG)
@@ -105,7 +105,6 @@ class GoldManager(Plugin):
                         'through ' + self.bot.nickname)
         else:  # author don't write a regex ; whatever it is, it's now its last words
             self.last_words[author] = matched_groups[0]
-        self.save_gold()
         return results
 
     @property
@@ -148,16 +147,9 @@ class GoldManager(Plugin):
             return False
         return True
 
-    def save_gold(self):
-        with open(self.filename, 'wb') as fd:
-            pickle.dump(self.gold, fd)
-        # print('GOLD: gold table saved:', self.gold)
-
-
     def accept(self, reason, author):
         """Return True if given reason is sufficient for get a gold"""
         return author in self.bot.sudoers
-
 
     def reset_gold(self):
         """Reset all golds. Note : all gold are loss"""
@@ -167,24 +159,31 @@ class GoldManager(Plugin):
             for _ in range(Gold.INITIAL_GOLD_COUNT)
         )
 
-
-    def load_gold(self):
-        try:
-            with open(self.filename, 'rb') as fd:
-                self.gold = pickle.load(fd)
-            # print('GOLD: gold table loaded:', self.gold)
-        except IOError:
-            # print('GOLD: new gold table created')
-            self.reset_gold()
-
     @property
     def initial_gold_count(self):
         return self.gold[self.bot.nickname]
+
     @initial_gold_count.setter
     def initial_gold_count(self, value):
         self.gold[self.bot.nickname] = int(value)
         assert value >= 0
 
     @property
-    def filename(self):
-        return super().filename(GoldManager.GOLD_FILE)
+    def persistent_data(self):
+        return self.gold
+
+    @persistent_data.setter
+    def persistent_data(self, values):
+        self.gold = values
+
+    @property
+    def debug_data(self):
+        return self.gold
+
+    def default_persistant_data(self):
+        """Return the default persistent data"""
+        golds = deque(
+            Gold(None, self.bot.nickname, str(i), None)
+            for i in range(Gold.INITIAL_GOLD_COUNT)
+        )
+        return {self.bot.nickname: golds}  # dict {nickname: golds}
