@@ -41,11 +41,12 @@ class Corrector(Plugin):
                 try:
                     regex   = re.compile(regres[0])
                     replace = regres[1] if len(regres) > 1 else ''
-                    self.last_words[author] = re.sub(regex, replace,
-                                                     self.last_words[author])
-                    results = self.last_words[author]
-                    results += ' \t«««« corrected ' + author + ' words'
-                except re.sre_constants.error:
+                    corrected = re.sub(regex, replace, self.last_words[author])
+                    if corrected != self.last_words[author]:
+                        results = corrected
+                        results += ' \t«««« corrected ' + author + ' words'
+                        self.last_words[author] = corrected
+                except re.sre_constants.error:  # TODO: attribute error
                     # something go wrong with user's regex
                     results += "from the dark side, you're REGEX comes.\n"
         else:  # author don't write a regex ; whatever it is, it's now its last words
