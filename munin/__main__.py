@@ -23,3 +23,4 @@ if __name__ == '__main__':
     config = configuration(docopt_doc=__doc__)
     print(config)
     Control(Bot(config))
+    print('THE END !')
