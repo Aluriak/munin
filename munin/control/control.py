@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Define the controller of the Bot itself.
 
@@ -6,6 +5,7 @@ The controller provide a full command line interface for administration:
     - dynamic plugins
     - IRC interactions
     - sudoers management
+
 """
 
 
@@ -40,6 +40,7 @@ COMMAND_NAMES = {
     'args'    : ('.*',),
     'help'    : ('help', 'h',),
     'operate' : ('op', 'operate',),  # debug command
+    'debug'   : ('debug', 'dbg',),  # debug command
 }
 # printings values
 PRINTINGS_PLUGINS_MAX_WIDTH = 20
@@ -70,6 +71,7 @@ def commands_grammar():
         + cmd2reg('say'    , None      , 'args')
         + cmd2reg('help'   , None      , None  )
         + cmd2reg('operate', None      , None  )
+        + cmd2reg('debug'  , None      , None  )
     )
     LOGGER.debug('GRAMMAR:\n' + grammar)
     return pt_compile(grammar)
@@ -110,7 +112,7 @@ class Control():
         while not self.finished:
             try:
                 text  = get_input(prompt)
-            except EOFError:
+            except (EOFError, KeyboardInterrupt):
                 self.__disconnect()
                 continue
             match = grammar.match(text)
@@ -258,23 +260,13 @@ class Control():
                     gold_manager.give_gold(receiver)
                     print('Gold added to', receiver)
 
+    def __debug(self):
+        for plugin in self.available_plugins:
+            print('\n' + str(plugin), plugin.__class__.__name__)
+            print('\n\t', plugin.debug_data)
+
+
     def active(self, plugin):
         """True if given plugin is active, ie is referenced by bot"""
         assert plugin in self.available_plugins
         return self.bot.has_plugin(plugin)
-
-
-# PREDICATS ###################################################################
-# ACCESSORS ###################################################################
-# CONVERSION ##################################################################
-# OPERATORS ###################################################################
-
-
-
-
-#########################
-# FUNCTIONS             #
-#########################
-
-
-
