@@ -22,5 +22,4 @@ from munin.control import Control
 if __name__ == '__main__':
     config = configuration(docopt_doc=__doc__)
     print(config)
-    exit()
     Control(Bot(config))
