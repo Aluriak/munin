@@ -35,12 +35,11 @@ class Bot(irc.bot.SingleServerIRCBot):
         assert 0. <= self.expressivity <= 1.
 
         # check Plugins, if some have something to say
-        def wait(): time.sleep(self.check_time)
         def check_timer(bot_instance):
-            wait()
+            time.sleep(self.check_time)
             while bot_instance.is_connected():
                 bot_instance.check_plugins()
-                wait()
+                time.sleep(self.check_time)
         self.check_func_thread = threading.Thread(target=check_timer, args=[self])
         self.check_func_thread.start()
 
@@ -120,12 +119,8 @@ class Bot(irc.bot.SingleServerIRCBot):
     def disconnect(self):
         """Disconnect from IRC, and finish"""
         LOGGER.info('disconnected from IRC')
-        try:
-            self.connection.quit('Good Bye !')
-        except irc.client.ServerNotConnectedError:
-            pass
+        self.connection.disconnect('Good Bye !')
         self.check_func_thread.join()
-        self.die()
 
 
     def on_nicknameinuse(self, c, e):
@@ -176,6 +171,9 @@ class Bot(irc.bot.SingleServerIRCBot):
     @property
     def nickname(self):
         return self.config.nickname
+    @nickname.setter
+    def nickname(self, value):
+        self.config['nickname'] = value
     @property
     def sudoers(self):
         return self.config.sudoers
