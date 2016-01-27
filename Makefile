@@ -1,10 +1,11 @@
 CHAN=--channel=\#big_rennes
 
+CONFIG_FILE=config.json
 OPTIONS=$(CHAN)
 
 
 mnn:
-	python3 -m munin $(OPTIONS)
+	python3 -m munin $(CONFIG_FILE) $(OPTIONS)
 
 tt:
 	pylint munin/__main__.py
