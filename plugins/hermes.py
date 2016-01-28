@@ -41,7 +41,7 @@ class Hermes(Plugin):
                 # print('GET MSG:', self.messages)
                 if author in self.messages:
                     for sender, msg in self.messages[author].items():
-                        results += 'From ' + sender + ': ' + msg
+                        results += 'From ' + sender + ': ' + msg + '\n'
                     del self.messages[author]
         return results
 
