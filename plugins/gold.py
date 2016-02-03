@@ -28,9 +28,10 @@ class Gold:
 
 
     def __str__(self):
-        return 'Gold of ' + self.receiver + '(' + str(self.predecessor_count) + ' predecessors)'
+        return 'Gold with ' + str(self.predecessor_count) + ' predecessors'
+
     def __repr__(self):
-        return str(self)
+        return 'Gold of ' + self.receiver + '(' + str(self.predecessor_count) + ' predecessors)'
 
 
 class GoldManager(Plugin):
@@ -196,7 +197,10 @@ class GoldManager(Plugin):
 
     @property
     def debug_data(self):
-        return self.gold
+        return '\n\t'.join(
+            owner + ' (' + str(len(golds)) + '): ' + ', '.join(str(gold) for gold in golds)
+            for owner, golds in self.gold.items()
+        )
 
     def default_persistant_data(self):
         """Return the default persistent data"""
