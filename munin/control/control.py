@@ -30,14 +30,16 @@ COMMAND_SUDO_DEL    = ('d', 'del', 'rm')
 # all commands, subcommands and other regex in a main dict
 COMMAND_NAMES = {
     'quit'    : ('q', 'quit', ':q', 'exit'),
-    'sudo'    : ('sudo', 'sudoers', 'sd'),
     'plugins' : ('plugins', 'plugin', 'pg', 'pl', 'plg'),
+    'sudoers' : ('sudoers', 'sudoer', 'sudo', 'su', 'sd'),
     'irc'     : ('irc', 'lastwords', 'words', 'last', 'lw', 'w', 'wl'),
     'say'     : ('say',),
     'subsudo' : COMMAND_SUDO_ADD + COMMAND_SUDO_DEL,
     'subpgarg': COMMAND_PLUGINS_ADD + COMMAND_PLUGINS_DEL,
     'subpgnoa': COMMAND_PLUGINS_PRT + COMMAND_PLUGINS_LS,
+    'subsudos': COMMAND_SUDO_ADD + COMMAND_SUDO_DEL,
     'args'    : ('.*',),
+    'nick'    : ('[a-zA-Z0-9_-]+',),
     'help'    : ('help', 'h',),
     'operate' : ('op', 'operate',),  # debug command
     'debug'   : ('debug', 'dbg',),  # debug command
@@ -63,10 +65,10 @@ def commands_grammar():
         )
     # get grammar, log it and return it
     grammar = (
-          cmd2reg('sudo'   , 'subsudo' , 'args')
-        + cmd2reg('quit'   , None      , None  )
+          cmd2reg('quit'   , None      , None  )
         + cmd2reg('plugins', 'subpgnoa', None  )
         + cmd2reg('plugins', 'subpgarg', 'args')
+        + cmd2reg('sudoers', 'subsudos', 'nick')
         + cmd2reg('irc'    , None      , 'args')
         + cmd2reg('say'    , None      , 'args')
         + cmd2reg('help'   , None      , None  )
@@ -123,9 +125,7 @@ class Control():
                 subcmd = values.get('subcmd')
                 args   = values.get('args')
                 LOGGER.debug('LINE:' + str(cmd) + str(subcmd) + str(args))
-                if cmd in COMMAND_NAMES['sudo']:
-                    self.__sudo(subcmd, args)
-                elif cmd in COMMAND_NAMES['plugins']:
+                if cmd in COMMAND_NAMES['plugins']:
                     self.__plugins(subcmd, args)
                 elif cmd in COMMAND_NAMES['quit']:
                     self.__disconnect()
@@ -137,6 +137,8 @@ class Control():
                     self.__help()
                 elif cmd in COMMAND_NAMES['operate']:
                     self.__operate()
+                elif cmd in COMMAND_NAMES['sudoers']:
+                    self.__sudoers(subcmd, args)
                 elif cmd in COMMAND_NAMES['debug']:
                     self.__debug()
             else:
@@ -149,17 +151,6 @@ class Control():
 
 # PUBLIC METHODS ##############################################################
 # PRIVATE METHODS #############################################################
-    def __sudo(self, subcmd, arg):
-        """add asked sudoer to bot sudoers list"""
-        if subcmd in COMMAND_SUDO_ADD:
-            print('SUDOERS: adding', arg, 'is necessary, but actually not performed')
-        else:
-            print('SUDOERS: removing', arg, 'is necessary, but actually not performed')
-        LOGGER.debug(arg)
-        LOGGER.debug('not implemented !')
-        print('OK !')
-        #self.bot.add_sudoer(arg)
-
     def __disconnect(self):
         """save persistant data, and disconnect and quit all connections"""
         for plugin in self.available_plugins:
@@ -222,6 +213,17 @@ class Control():
         # error output
         if error is not None:
             print('ERROR:', error_code[error])
+
+
+    def __sudoers(self, subcmd, args):
+        """Manage sudoers"""
+        if subcmd in COMMAND_SUDO_ADD:
+            self.bot.add_sudoer(args)
+            print('New sudo:', args)
+        elif subcmd in COMMAND_SUDO_DEL:
+            self.bot.rmv_sudoer(args)
+            print(args, 'is no longer a sudoer')
+        print('Sudoers: ', self.bot.sudoers)
 
 
     def __last_words(self, args):
