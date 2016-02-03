@@ -165,10 +165,16 @@ class GoldManager(Plugin):
 
     def reset_gold(self):
         """Reset all golds. Note : all gold are loss"""
+        previous_gold = tuple(
+            (user, gold)
+            for user, golds in self.gold.items()
+            for gold in golds
+        )
+        # reset gold dict, and transfer all golds to bot
         self.gold = defaultdict(deque) # author: deque(gold instances)
         self.gold[self.bot.nickname] = deque(
-            Gold(self.bot.nickname, self.bot.nickname, 'initial gold', None)
-            for _ in range(Gold.INITIAL_GOLD_COUNT)
+            Gold(user, self.bot.nickname, 'gold reset', gold)
+            for user, gold in previous_gold
         )
 
     @property
