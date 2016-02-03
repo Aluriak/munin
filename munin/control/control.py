@@ -41,6 +41,7 @@ COMMAND_NAMES = {
     'args'    : ('.*',),
     'nick'    : ('[a-zA-Z0-9_-]+',),
     'help'    : ('help', 'h',),
+    'save'    : ('save', 'save data', 'datasave',),
     'operate' : ('op', 'operate',),  # debug command
     'debug'   : ('debug', 'dbg',),  # debug command
 }
@@ -73,6 +74,7 @@ def commands_grammar():
         + cmd2reg('say'    , None      , 'args')
         + cmd2reg('help'   , None      , None  )
         + cmd2reg('operate', None      , None  )
+        + cmd2reg('save'   , None      , None  )
         + cmd2reg('debug'  , None      , None  )
     )
     LOGGER.debug('GRAMMAR:\n' + grammar)
@@ -141,6 +143,8 @@ class Control():
                     self.__sudoers(subcmd, args)
                 elif cmd in COMMAND_NAMES['debug']:
                     self.__debug()
+                elif cmd in COMMAND_NAMES['save']:
+                    self.__save_persistant_data()
             else:
                 print('not a valid command')
 
@@ -151,10 +155,13 @@ class Control():
 
 # PUBLIC METHODS ##############################################################
 # PRIVATE METHODS #############################################################
-    def __disconnect(self):
-        """save persistant data, and disconnect and quit all connections"""
+    def __save_persistant_data(self):
         for plugin in self.available_plugins:
             plugin.save_persistent_data()
+
+    def __disconnect(self):
+        """save persistant data, and disconnect and quit all connections"""
+        self.__save_persistant_data()
         self.finished = True
         self.bot.disconnect()
 
