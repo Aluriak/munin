@@ -47,7 +47,8 @@ class Hermes(Plugin):
 
     @property
     def help(self):
-        return """HERMES: leave a message with 'msgto gérard mymessage', and get yours with 'bot: mymsg'"""
+        return ("""HERMES: leave a message with 'bot: msgto gérard mymessage', """
+                """and get yours with 'bot: mymsg'""")
 
     @property
     def debug_data(self):
