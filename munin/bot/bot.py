@@ -30,11 +30,12 @@ class Bot(irc.bot.SingleServerIRCBot):
     def __init__(self, config):
         super().__init__([(config.server, config.port)],
                          config.nickname, config.realname)
+        # get config and cast some values
         self.config = config
-        self.plugins = set()  # activated plugins
+        self.config['sudoers'] = set(self.config['sudoers'])
         assert 0. <= self.expressivity <= 1.
-
         # check Plugins, if some have something to say
+        self.plugins = set()  # activated plugins
         def check_timer(bot_instance):
             time.sleep(self.check_time)
             while bot_instance.is_connected():
