@@ -204,4 +204,4 @@ class GoldManager(Plugin):
             Gold(None, self.bot.nickname, str(i), None)
             for i in range(Gold.INITIAL_GOLD_COUNT)
         )
-        return {self.bot.nickname: golds}  # dict {nickname: golds}
+        return defaultdict(deque, {self.bot.nickname: golds})  # dict {nickname: golds}
