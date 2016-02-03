@@ -46,7 +46,7 @@ class Corrector(Plugin):
                         results = corrected
                         results += ' \t«««« corrected ' + author + ' words'
                         self.last_words[author] = corrected
-                except re.sre_constants.error:  # TODO: attribute error
+                except re.error:
                     # something go wrong with user's regex
                     results += "from the dark side, you're REGEX comes.\n"
         else:  # author don't write a regex ; whatever it is, it's now its last words
