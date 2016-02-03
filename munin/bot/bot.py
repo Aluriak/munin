@@ -98,7 +98,11 @@ class Bot(irc.bot.SingleServerIRCBot):
 
     def add_sudoer(self, name):
         """add given name to sudoers"""
-        self.sudoers.add(name)
+        self.config['sudoers'].add(name)
+
+    def rmv_sudoer(self, name):
+        """remove given name to sudoers"""
+        self.config['sudoers'].remove(name)
 
     def do_command(self, message):
         """send message to plugins"""
