@@ -148,6 +148,8 @@ class GoldManager(Plugin):
     def give_gold(self, receiver, donator=None, reason='administration'):
         if donator is None:
             donator = self.bot.nickname
+        if donator == receiver:
+            return False
         try:
             oldgold = self.gold[donator].popleft()
             self.gold[receiver].append(Gold(
