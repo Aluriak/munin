@@ -18,9 +18,19 @@ class Gold:
     """
     INITIAL_GOLD_COUNT = 20
 
-    def __init__(self, donator, receiver, message, old_gold):
+    def __init__(self, donator, receiver, message, old_gold=None):
         self.donator, self.receiver, self.message = donator, receiver, message
         self.old = old_gold
+
+    @property
+    def predecessor_count(self):
+        return 1 + (self.old.predecessor_count if self.old else 0)
+
+
+    def __str__(self):
+        return 'Gold of ' + self.receiver + '(' + str(self.predecessor_count) + ' predecessors)'
+    def __repr__(self):
+        return str(self)
 
 
 class GoldManager(Plugin):
