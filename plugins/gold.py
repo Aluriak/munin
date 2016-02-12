@@ -178,6 +178,12 @@ class GoldManager(Plugin):
             for user, gold in previous_gold
         )
 
+    def create_gold_for(self, dest, nb_gold=1):
+        """Create a new gold, given to dest"""
+        for _ in range(int(nb_gold)):
+            new_gold = Gold(None, dest, 'shut up and take my money')
+            self.gold[dest].append(new_gold)
+
     @property
     def initial_gold_count(self):
         return self.gold[self.bot.nickname]
