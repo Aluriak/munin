@@ -102,7 +102,10 @@ class Bot(irc.bot.SingleServerIRCBot):
 
     def rmv_sudoer(self, name):
         """remove given name to sudoers"""
-        self.config['sudoers'].remove(name)
+        try:
+            self.config['sudoers'].remove(name)
+        except KeyError:
+            pass
 
     def do_command(self, message):
         """send message to plugins"""
