@@ -247,7 +247,10 @@ class Control():
 
 
     def __operate(self):
-        command = int(input("""\t0: send gold to...\n\t1: take gold of...\t\t2: take n gold of...\n\t3:send n gold to many..."""))
+        command = int(input("""\t0: send gold to...\n\t1: take gold of..."""
+                            """\t\t2: take n gold of..."""
+                            """\n\t3: send n gold to many..."""
+                            """\t4: create a new gold for..."""))
         gold_manager = next(plugin for plugin in self.bot.plugins
                             if 'GoldManager' in plugin.__class__.__name__)
         if command == 0:
@@ -273,6 +276,13 @@ class Control():
                 for _ in range(nb_gold):
                     gold_manager.give_gold(receiver)
                     print('Gold added to', receiver)
+        elif command == 4:
+            nb_gold = int(input('nb gold: '))
+            receiver = input('give it to: ')
+            gold_manager.create_gold_for(receiver, nb_gold)
+            print(nb_gold, 'given to ' + receiver + '.')
+        else:
+            print('w00t ?')
 
     def __debug(self):
         for plugin in self.available_plugins:
