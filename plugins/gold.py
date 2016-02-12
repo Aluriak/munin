@@ -181,8 +181,17 @@ class GoldManager(Plugin):
     def create_gold_for(self, dest, nb_gold=1):
         """Create a new gold, given to dest"""
         for _ in range(int(nb_gold)):
-            new_gold = Gold(None, dest, 'shut up and take my money')
+            new_gold = Gold(None, dest, 'administration')
             self.gold[dest].append(new_gold)
+
+    def clean_unused_names(self):
+        """Remove unused names in gold database"""
+        self.gold = defaultdict(deque, {
+            k: v for k, v in self.gold.items()
+            if len(v) > 0
+        })
+        # avoid weird message like "munin don't know munin"
+        self.gold[self.bot.nickname] = self.gold[self.bot.nickname]
 
     @property
     def initial_gold_count(self):
