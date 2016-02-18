@@ -250,7 +250,8 @@ class Control():
         command = int(input("""\t0: send gold to...\n\t1: take gold of..."""
                             """\t\t2: take n gold of..."""
                             """\n\t3: send n gold to many..."""
-                            """\t4: create a new gold for..."""))
+                            """\t4: create a new gold for..."""
+                            """\n\t5: clear unused names."""))
         gold_manager = next(plugin for plugin in self.bot.plugins
                             if 'GoldManager' in plugin.__class__.__name__)
         if command == 0:
@@ -281,6 +282,11 @@ class Control():
             receiver = input('give it to: ')
             gold_manager.create_gold_for(receiver, nb_gold)
             print(nb_gold, 'given to ' + receiver + '.')
+
+        elif command == 5:
+            gold_manager.clean_unused_names()
+            print('Unused names cleaned !')
+
         else:
             print('w00t ?')
 
