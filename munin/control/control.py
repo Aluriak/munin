@@ -251,7 +251,8 @@ class Control():
                             """\t\t2: take n gold of..."""
                             """\n\t3: send n gold to many..."""
                             """\t4: create a new gold for..."""
-                            """\n\t5: clear unused names."""))
+                            """\n\t5: clear unused names."""
+                            """\t\t6: generate graph."""))
         gold_manager = next(plugin for plugin in self.bot.plugins
                             if 'GoldManager' in plugin.__class__.__name__)
         if command == 0:
@@ -286,6 +287,10 @@ class Control():
         elif command == 5:
             gold_manager.clean_unused_names()
             print('Unused names cleaned !')
+
+        elif command == 6:
+            output_filename = input('output filename: ')
+            gold_manager.save_graph(output_filename)
 
         else:
             print('w00t ?')
