@@ -3,9 +3,12 @@ Gold point management.
 
 """
 from collections import defaultdict, deque
+from itertools import chain
 import random
 import pickle
 import re
+
+import networkx
 
 from munin.plugin import Plugin
 
@@ -32,6 +35,17 @@ class Gold:
 
     def __repr__(self):
         return 'Gold of ' + self.receiver + '(' + str(self.predecessor_count) + ' predecessors)'
+
+    def enrich(self, graph, id=''):
+        """Enrich the graph representation with the gold data and its predecessors"""
+        self_id = str(self.message)
+        graph.add_node(self_id, message=self_id,
+                       author=str(self.receiver), donator=str(self.donator))
+        if self.old:
+            graph.add_edge(self.old.enrich(graph, id=id+'1'),
+                           self_id,
+                           label=str(self.donator) + ' to ' + str(self.receiver))
+        return self_id
 
 
 class GoldManager(Plugin):
@@ -224,3 +238,11 @@ class GoldManager(Plugin):
             for i in range(Gold.INITIAL_GOLD_COUNT)
         )
         return defaultdict(deque, {self.bot.nickname: golds})  # dict {nickname: golds}
+
+    def save_graph(self, filename):
+        """Save graph of golds in GML format, in given file"""
+        graph = networkx.DiGraph()
+        for idx, gold in enumerate(chain.from_iterable(self.gold.values())):
+            gold.enrich(graph, id=str(idx))
+        networkx.write_gml(graph, filename)
+
