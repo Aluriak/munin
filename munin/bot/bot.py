@@ -145,7 +145,8 @@ class Bot(irc.bot.SingleServerIRCBot):
 
     def on_privmsg(self, c, e):
         assert(c == self.connection)
-        message = ircmessage.IRCMessage(e.arguments[0], e.source.nick)
+        author = e.source.nick
+        message = ircmessage.IRCMessage(e.arguments[0], author)
         LOGGER.info(author + ' published: ' + str(message))
 
     def on_pubmsg(self, c, e):
